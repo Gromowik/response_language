@@ -78,6 +78,29 @@ body {
   margin: 0;
 }
 
+.app-footer {
+  margin-top: auto;
+  padding: 1.25rem 1.5rem;
+  background: #2c3e50;
+  color: #d6dee6;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.app-footer p {
+  margin: 0.25rem 0;
+}
+
+.app-footer a {
+  color: #4ECDC4;
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 768px) {
   .app-header {
     padding: 1rem;

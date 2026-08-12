@@ -519,6 +519,24 @@ function App() {
           allCardsPerson2={cardsPerson2}
         />
       )}
+
+      <footer className="app-footer">
+        <p>Автор: Serge Gromowik</p>
+        <p>
+          Кто желает участвовать в проекте, может обращаться на почту{' '}
+          <a href="mailto:serge.gromowik@gmail.com">serge.gromowik@gmail.com</a>
+        </p>
+        <p>
+          Связанный проект:{' '}
+          <a
+            href="https://models-for-psychology.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            models-for-psychology.vercel.app
+          </a>
+        </p>
+      </footer>
     </div>
   )
 }
