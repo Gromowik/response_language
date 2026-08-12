@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local version archives (not for deploy)
+public/3/
+public/4/
+public/5/
+public/6/
+public/7/
