@@ -105,6 +105,12 @@ body {
   margin: 0.25rem 0;
 }
 
+.app-footer-note {
+  color: #f0c36d;
+  font-weight: 600;
+  margin-bottom: 0.6rem !important;
+}
+
 .app-footer a {
   color: #4ECDC4;
   text-decoration: none;
