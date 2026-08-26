@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './CircularTape.module.css'
+import { getFitCanvasSize, getFitCircleRadius } from '../utils/viewport'
 
 const CARD_WIDTH = 70 // Увеличили размер объектов
 const CARD_SPACING = 5
@@ -17,12 +18,12 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
   // Update canvas size on window resize
   useEffect(() => {
     const updateSize = () => {
-      const canvas = canvasRef.current
-      if (canvas && canvas.parentElement) {
-        const width = Math.max(800, window.innerWidth - 40)
-        const height = Math.max(800, window.innerHeight - 140)
-        setCanvasSize({ width, height })
-      }
+      const { width, height } = getFitCanvasSize({
+        minDesktopWidth: 800,
+        minDesktopHeight: 800,
+        chrome: 180,
+      })
+      setCanvasSize({ width, height })
     }
 
     updateSize()
@@ -74,6 +75,12 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
     const ctx = canvas.getContext('2d')
     const centerX = canvasSize.width / 2
     const centerY = canvasSize.height / 2
+    const circleRadius = getFitCircleRadius(
+      CIRCLE_RADIUS,
+      canvasSize.width,
+      canvasSize.height,
+      CARD_WIDTH
+    )
 
     // Background
     ctx.fillStyle = '#f5f5f5'
@@ -83,7 +90,7 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
     ctx.strokeStyle = '#ddd'
     ctx.lineWidth = 2
     ctx.beginPath()
-    ctx.arc(centerX, centerY, CIRCLE_RADIUS, 0, 2 * Math.PI)
+    ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI)
     ctx.stroke()
 
     // Get visible cards (handle case when cards.length < MAX_VISIBLE or wrapping around)
@@ -109,7 +116,7 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
 
       // Позиционируем центр полного круга на 3/4 радиуса объекта во внешнюю сторону от окружности
       // Это выносит объекты дальше от центра общего круга
-      const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4 // 3/4 радиуса объекта
+      const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4 // 3/4 радиуса объекта
       const cardCenterX = centerX + offsetRadius * Math.cos(angle)
       const cardCenterY = centerY + offsetRadius * Math.sin(angle)
 
@@ -158,9 +165,9 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
     // Draw focus indicator at top
     ctx.fillStyle = '#FFD700'
     ctx.beginPath()
-    ctx.moveTo(centerX, centerY - CIRCLE_RADIUS - 20)
-    ctx.lineTo(centerX - 12, centerY - CIRCLE_RADIUS)
-    ctx.lineTo(centerX + 12, centerY - CIRCLE_RADIUS)
+    ctx.moveTo(centerX, centerY - circleRadius - 20)
+    ctx.lineTo(centerX - 12, centerY - circleRadius)
+    ctx.lineTo(centerX + 12, centerY - circleRadius)
     ctx.closePath()
     ctx.fill()
 
@@ -171,7 +178,7 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
       
       const dragAngle = dragging.angle
       // Центр круга с тем же смещением при перетаскивании
-      const dragOffsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+      const dragOffsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
       const dragCenterX = centerX + dragOffsetRadius * Math.cos(dragAngle)
       const dragCenterY = centerY + dragOffsetRadius * Math.sin(dragAngle)
 
@@ -205,8 +212,10 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const x = (e.clientX - rect.left) * scaleX
+    const y = (e.clientY - rect.top) * scaleY
 
     // Get visible cards with cyclic wrapping (same logic as drawing)
     const totalVisible = Math.min(MAX_VISIBLE, cards.length)
@@ -262,8 +271,10 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
 
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const x = (e.clientX - rect.left) * scaleX
+    const y = (e.clientY - rect.top) * scaleY
 
     const centerX = canvasSize.width / 2
     const centerY = canvasSize.height / 2
@@ -284,8 +295,10 @@ export default function CircularTape({ cards, onCardEdit, onCardsReorder, initia
 
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
-    const endX = e.clientX - rect.left
-    const endY = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const endX = (e.clientX - rect.left) * scaleX
+    const endY = (e.clientY - rect.top) * scaleY
 
     const timeDiff = Date.now() - dragging.startTime
     const distMoved = Math.sqrt(

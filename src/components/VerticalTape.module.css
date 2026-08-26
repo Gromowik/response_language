@@ -130,3 +130,28 @@
   pointer-events: none;
   z-index: 20;
 }
+
+@media (max-width: 768px) {
+  .container {
+    height: auto;
+    min-height: calc(100vh - 120px);
+    overflow: auto;
+  }
+
+  .commonControls {
+    gap: 0.5rem;
+    padding: 0.6rem;
+  }
+
+  .tapeContainer {
+    height: auto;
+    min-height: 70vh;
+    min-width: 640px;
+  }
+
+  .info,
+  .sortLabel {
+    font-size: 0.75rem;
+  }
+}
+

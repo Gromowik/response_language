@@ -177,3 +177,36 @@
   z-index: 10;
 }
 
+@media (max-width: 768px) {
+  .container {
+    height: auto;
+    min-height: calc(100vh - 120px);
+    overflow: auto;
+  }
+
+  .commonControls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.6rem;
+  }
+
+  .tapeContainer {
+    height: auto;
+    min-height: 70vh;
+    min-width: 640px;
+    overflow: visible;
+  }
+
+  .leftControls,
+  .rightControls {
+    flex-wrap: wrap;
+    padding: 0.5rem;
+  }
+
+  .info,
+  .sortLabel {
+    font-size: 0.75rem;
+  }
+}
+
+

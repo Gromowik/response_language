@@ -85,3 +85,32 @@
   color: white;
   font-weight: bold;
 }
+
+@media (max-width: 768px) {
+  .container {
+    height: auto;
+    min-height: calc(100vh - 120px);
+  }
+
+  .controls {
+    gap: 0.5rem;
+    padding: 0.6rem;
+  }
+
+  .button {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .info {
+    min-width: 0;
+    font-size: 0.8rem;
+  }
+
+  .canvas {
+    width: 100%;
+    max-height: none;
+    min-height: 360px;
+  }
+}
+

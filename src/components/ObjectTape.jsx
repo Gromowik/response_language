@@ -5,6 +5,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import styles from './ObjectTape.module.css';
+import { canvasPointer } from '../utils/viewport';
 
 const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToCircular }) => {
   const canvasRef = useRef(null);
@@ -15,14 +16,25 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
   const [specialFocusCardId, setSpecialFocusCardId] = useState(null); // Особый фокус для отдельного рассмотрения (по ID карточки)
   const [dragging, setDragging] = useState(null); // { cardIndex, offsetX, offsetY, currentX, currentY }
 
-  const CARD_WIDTH = 80;
-  const CARD_SPACING = 40; // Увеличили расстояние между объектами еще больше
+  const CARD_WIDTH = canvasWidth < 768 ? 64 : 80;
+  const CARD_SPACING = canvasWidth < 768 ? 24 : 40; // Увеличили расстояние между объектами еще больше
   const TAPE_Y = 150; // Сдвинули ленту вниз, чтобы освободить место для особого фокуса
   const SPECIAL_FOCUS_Y = 50; // Y позиция особого фокуса (круг над лентой)
-  const MAX_VISIBLE = 10;
+  const MAX_VISIBLE = Math.max(
+    3,
+    Math.min(10, Math.floor((canvasWidth - 24) / (CARD_WIDTH + CARD_SPACING)))
+  );
 
   // Focus is always on the rightmost (last visible) card
   const focusIndex = startIndex + MAX_VISIBLE - 1;
+
+  // Keep startIndex valid when visible window size changes (e.g. mobile)
+  useEffect(() => {
+    const maxStart = Math.max(0, cards.length - MAX_VISIBLE);
+    if (startIndex > maxStart) {
+      setStartIndex(maxStart);
+    }
+  }, [MAX_VISIBLE, cards.length, startIndex]);
 
   // Handle window resize
   useEffect(() => {
@@ -246,9 +258,7 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
   const handleDoubleClick = (e) => {
     if (specialFocusCardId) {
       const canvas = canvasRef.current;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
       
       const specialCard = cards.find(c => c.id === specialFocusCardId);
       if (specialCard && specialCard._specialFocusX !== undefined) {
@@ -267,9 +277,7 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
   // Mouse handlers for dragging
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     // Check if clicking on special focus circle
     if (specialFocusCardId) {
@@ -315,9 +323,7 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
     if (!dragging) return;
 
     const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     setDragging({
       ...dragging,
@@ -331,13 +337,12 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
 
     const timeDiff = Date.now() - dragging.startTime;
     const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     // Check if it was a quick click (< 200ms and small movement)
     const distMoved = Math.sqrt(
       Math.pow(x - dragging.currentX, 2) + 
-      Math.pow((e.clientY - rect.top) - dragging.currentY, 2)
+      Math.pow(y - dragging.currentY, 2)
     );
 
     if (timeDiff < 200 && distMoved < 5) {
@@ -483,6 +488,25 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onDoubleClick={handleDoubleClick}
+        onTouchStart={(e) => {
+          if (e.touches.length !== 1) return
+          const t = e.touches[0]
+          handleMouseDown({ clientX: t.clientX, clientY: t.clientY, detail: 1 })
+        }}
+        onTouchMove={(e) => {
+          if (!dragging || e.touches.length !== 1) return
+          e.preventDefault()
+          const t = e.touches[0]
+          handleMouseMove({ clientX: t.clientX, clientY: t.clientY })
+        }}
+        onTouchEnd={(e) => {
+          const t = e.changedTouches[0]
+          if (!t) {
+            setDragging(null)
+            return
+          }
+          handleMouseUp({ clientX: t.clientX, clientY: t.clientY, detail: 1 })
+        }}
         style={{ cursor: dragging ? 'grabbing' : 'pointer' }}
       />
     </div>

@@ -8,10 +8,13 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import styles from './PairedCircularTapes.module.css'
+import { getFitCanvasSize, getFitCircleRadius } from '../utils/viewport'
 
 const CARD_WIDTH = 70
 const MAX_VISIBLE = 10
 const CIRCLE_RADIUS = 200
+
+const radiusFor = (width, height) => getFitCircleRadius(CIRCLE_RADIUS, width, height, CARD_WIDTH)
 
 export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardEdit, onRightCardEdit }) {
   const leftCanvasRef = useRef(null)
@@ -23,8 +26,11 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
   // Update canvas size on window resize
   useEffect(() => {
     const updateSize = () => {
-      const width = Math.max(1200, window.innerWidth - 40)
-      const height = Math.max(600, window.innerHeight - 140)
+      const { width, height } = getFitCanvasSize({
+        minDesktopWidth: 1200,
+        minDesktopHeight: 600,
+        chrome: 180,
+      })
       setCanvasSize({ width, height })
     }
 
@@ -131,6 +137,7 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     // Center of circle relative to this canvas
     const centerX = width / 2
     const centerY = height / 2
+    const circleRadius = radiusFor(width, height)
 
     // Background
     ctx.fillStyle = '#f5f5f5'
@@ -149,12 +156,12 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     ctx.strokeStyle = '#ddd'
     ctx.lineWidth = 2
     ctx.beginPath()
-    ctx.arc(centerX, centerY, CIRCLE_RADIUS, 0, 2 * Math.PI)
+    ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI)
     ctx.stroke()
 
     // Draw pairs - counter-clockwise from engagement point (rightmost point, angle = 0)
     const angleStep = (2 * Math.PI) / totalVisible
-    const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+    const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
 
     visiblePairs.forEach((pair, idx) => {
       if (!pair.left) return
@@ -206,9 +213,9 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     // Draw engagement point indicator at rightmost point (angle = 0)
     ctx.fillStyle = '#FFD700'
     ctx.beginPath()
-    ctx.moveTo(centerX + CIRCLE_RADIUS + 20, centerY)
-    ctx.lineTo(centerX + CIRCLE_RADIUS, centerY - 10)
-    ctx.lineTo(centerX + CIRCLE_RADIUS, centerY + 10)
+    ctx.moveTo(centerX + circleRadius + 20, centerY)
+    ctx.lineTo(centerX + circleRadius, centerY - 10)
+    ctx.lineTo(centerX + circleRadius, centerY + 10)
     ctx.closePath()
     ctx.fill()
   }
@@ -227,6 +234,7 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     // Center of circle relative to this canvas
     const centerX = width / 2
     const centerY = height / 2
+    const circleRadius = radiusFor(width, height)
 
     // Background
     ctx.fillStyle = '#f5f5f5'
@@ -245,12 +253,12 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     ctx.strokeStyle = '#ddd'
     ctx.lineWidth = 2
     ctx.beginPath()
-    ctx.arc(centerX, centerY, CIRCLE_RADIUS, 0, 2 * Math.PI)
+    ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI)
     ctx.stroke()
 
     // Draw pairs - clockwise from engagement point (leftmost point, angle = PI)
     const angleStep = (2 * Math.PI) / totalVisible
-    const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+    const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
 
     visiblePairs.forEach((pair, idx) => {
       if (!pair.right) return
@@ -302,9 +310,9 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     // Draw engagement point indicator at leftmost point (angle = PI)
     ctx.fillStyle = '#FFD700'
     ctx.beginPath()
-    ctx.moveTo(centerX - CIRCLE_RADIUS - 20, centerY)
-    ctx.lineTo(centerX - CIRCLE_RADIUS, centerY - 10)
-    ctx.lineTo(centerX - CIRCLE_RADIUS, centerY + 10)
+    ctx.moveTo(centerX - circleRadius - 20, centerY)
+    ctx.lineTo(centerX - circleRadius, centerY - 10)
+    ctx.lineTo(centerX - circleRadius, centerY + 10)
     ctx.closePath()
     ctx.fill()
   }
@@ -327,9 +335,10 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
     const leftCenterX = canvasSize.width / 4
     const rightCenterX = (3 * canvasSize.width) / 4
     const centerY = canvasSize.height / 2
+    const circleRadius = radiusFor(canvasSize.width / 2, canvasSize.height)
 
     const angleStep = (2 * Math.PI) / totalVisible
-    const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+    const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
 
     // Draw lines connecting pairs (only for actual pairs, not null placeholders)
     visiblePairs.forEach((pair, idx) => {
@@ -381,14 +390,17 @@ export default function PairedCircularTapes({ leftCards, rightCards, onLeftCardE
 
   const handleCanvasClick = (canvas, isLeft, e) => {
     const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const x = (e.clientX - rect.left) * scaleX
+    const y = (e.clientY - rect.top) * scaleY
 
     const width = canvasSize.width / 2
     const height = canvasSize.height
     const centerX = width / 2
     const centerY = height / 2
-    const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+    const circleRadius = radiusFor(width, height)
+    const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
     const angleStep = (2 * Math.PI) / totalVisible
 
     for (let i = 0; i < visiblePairs.length; i++) {

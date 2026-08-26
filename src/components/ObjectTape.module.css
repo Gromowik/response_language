@@ -76,5 +76,30 @@
   background-color: #fafafa;
   cursor: pointer;
   display: block;
+  touch-action: none;
 }
+
+@media (max-width: 768px) {
+  .controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.6rem;
+  }
+
+  .controls button {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .info {
+    font-size: 0.8rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .canvas {
+    height: 240px;
+  }
+}
+
 

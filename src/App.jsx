@@ -24,6 +24,12 @@ function App() {
   const [circularStartIndex, setCircularStartIndex] = useState(0) // Start index for Circular Tape to position focus at top
   const [editingCard, setEditingCard] = useState(null)
   const [isCreating, setIsCreating] = useState(null) // null, 'horizontal', 'horizontal2', 'vertical', 'leftVertical', 'circular', or 'philosophy'
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  const goToPage = (page) => {
+    setCurrentPage(page)
+    setMobileNavOpen(false)
+  }
 
   // Load cards on mount
   useEffect(() => {
@@ -279,70 +285,87 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Object Tape Calculator</h1>
-        <div className="app-controls">
+        <div className="app-header-top">
+          <h1>Object Tape Calculator</h1>
+          <button
+            type="button"
+            className="btn btn-primary mobile-nav-toggle"
+            aria-expanded={mobileNavOpen}
+            aria-controls="app-nav"
+            onClick={() => setMobileNavOpen((open) => !open)}
+          >
+            {mobileNavOpen ? 'Close menu' : 'Menu'}
+          </button>
+        </div>
+        <div
+          id="app-nav"
+          className={`app-controls ${mobileNavOpen ? 'app-controls-open' : ''}`}
+        >
           <button 
-            onClick={() => setCurrentPage('horizontal')}
+            onClick={() => goToPage('horizontal')}
             className={`btn ${currentPage === 'horizontal' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Person 1 Tape
           </button>
           <button 
-            onClick={() => setCurrentPage('horizontal2')}
+            onClick={() => goToPage('horizontal2')}
             className={`btn ${currentPage === 'horizontal2' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Person 2 Tape
           </button>
           <button 
-            onClick={() => setCurrentPage('leftVertical')}
+            onClick={() => goToPage('leftVertical')}
             className={`btn ${currentPage === 'leftVertical' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Vertical Person 1
           </button>
           <button 
-            onClick={() => setCurrentPage('vertical')}
+            onClick={() => goToPage('vertical')}
             className={`btn ${currentPage === 'vertical' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Vertical Person 2
           </button>
           <button 
-            onClick={() => setCurrentPage('bothVertical')}
+            onClick={() => goToPage('bothVertical')}
             className={`btn ${currentPage === 'bothVertical' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Both Vertical
           </button>
           <button 
-            onClick={() => setCurrentPage('circular')}
+            onClick={() => goToPage('circular')}
             className={`btn ${currentPage === 'circular' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Circular Tape
           </button>
           <button 
-            onClick={() => setCurrentPage('bothCircular')}
+            onClick={() => goToPage('bothCircular')}
             className={`btn ${currentPage === 'bothCircular' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Both Circular
           </button>
           <button 
-            onClick={() => setCurrentPage('pairedCircular')}
+            onClick={() => goToPage('pairedCircular')}
             className={`btn ${currentPage === 'pairedCircular' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Paired Circular
           </button>
           <button 
-            onClick={() => setCurrentPage('philosophy')}
+            onClick={() => goToPage('philosophy')}
             className={`btn ${currentPage === 'philosophy' ? 'btn-primary' : 'btn-secondary'}`}
           >
             Philosophie
           </button>
           <button 
-            onClick={() => setCurrentPage('readme')}
+            onClick={() => goToPage('readme')}
             className={`btn ${currentPage === 'readme' ? 'btn-primary' : 'btn-secondary'}`}
           >
             README
           </button>
           <button 
-            onClick={() => setIsCreating(currentPage)} 
+            onClick={() => {
+              setIsCreating(currentPage)
+              setMobileNavOpen(false)
+            }} 
             className="btn btn-primary"
             disabled={currentPage === 'philosophy' || currentPage === 'readme'}
           >

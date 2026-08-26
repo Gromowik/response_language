@@ -24,9 +24,22 @@ body {
   box-sizing: border-box;
 }
 
-.app-header h1 {
+.app-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.app-header h1 {
+  margin: 0;
   font-size: 2rem;
+}
+
+.mobile-nav-toggle {
+  display: none;
+  flex-shrink: 0;
 }
 
 .app-controls {
@@ -103,23 +116,61 @@ body {
 
 @media (max-width: 768px) {
   .app-header {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .app-header-top {
+    margin-bottom: 0;
   }
 
   .app-header h1 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.15rem;
+    line-height: 1.25;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.9rem;
+    width: auto;
   }
 
   .app-controls {
-    flex-direction: column;
+    display: none;
+    margin-top: 0.75rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    max-height: min(55vh, 420px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .btn {
-    width: 100%;
+  .app-controls.app-controls-open {
+    display: flex;
+  }
+
+  .app-controls .btn {
+    width: auto;
+    flex: 0 1 auto;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.8rem;
+    line-height: 1.2;
   }
 
   .app-main {
-    padding: 1rem;
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-footer {
+    padding: 0.9rem 1rem;
+    font-size: 0.85rem;
   }
 }

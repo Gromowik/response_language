@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import styles from './BothCircularTapes.module.css'
+import { getFitCanvasSize, getFitCircleRadius } from '../utils/viewport'
 
 const CARD_WIDTH = 70
 const MAX_VISIBLE = 10
@@ -18,8 +19,11 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
   // Update canvas size on window resize
   useEffect(() => {
     const updateSize = () => {
-      const width = Math.max(1200, window.innerWidth - 40)
-      const height = Math.max(600, window.innerHeight - 140)
+      const { width, height } = getFitCanvasSize({
+        minDesktopWidth: 1200,
+        minDesktopHeight: 600,
+        chrome: 180,
+      })
       setCanvasSize({ width, height })
     }
 
@@ -59,6 +63,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
     // Center of circle relative to this canvas (at center of canvas)
     const centerX = width / 2
     const centerY = height / 2
+    const circleRadius = getFitCircleRadius(CIRCLE_RADIUS, width, height, CARD_WIDTH)
 
     // Background
     ctx.fillStyle = '#f5f5f5'
@@ -83,7 +88,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
     ctx.strokeStyle = '#ddd'
     ctx.lineWidth = 2
     ctx.beginPath()
-    ctx.arc(centerX, centerY, CIRCLE_RADIUS, 0, 2 * Math.PI)
+    ctx.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI)
     ctx.stroke()
 
     // Draw cards
@@ -96,7 +101,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
       const angle = idx * angleStep - Math.PI / 2 // Start from top
 
       // Position center of circle at 3/4 radius outward from base circle
-      const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+      const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
       const cardCenterX = centerX + offsetRadius * Math.cos(angle)
       const cardCenterY = centerY + offsetRadius * Math.sin(angle)
 
@@ -141,9 +146,9 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
     // Draw focus indicator at top
     ctx.fillStyle = '#FFD700'
     ctx.beginPath()
-    ctx.moveTo(centerX, centerY - CIRCLE_RADIUS - 20)
-    ctx.lineTo(centerX - 10, centerY - CIRCLE_RADIUS)
-    ctx.lineTo(centerX + 10, centerY - CIRCLE_RADIUS)
+    ctx.moveTo(centerX, centerY - circleRadius - 20)
+    ctx.lineTo(centerX - 10, centerY - circleRadius)
+    ctx.lineTo(centerX + 10, centerY - circleRadius)
     ctx.closePath()
     ctx.fill()
 
@@ -152,7 +157,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
     ctx.font = '14px Arial'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'top'
-    ctx.fillText(label, centerX, centerY + CIRCLE_RADIUS + 60)
+    ctx.fillText(label, centerX, centerY + circleRadius + 60)
   }
 
   // Draw both tapes
@@ -168,13 +173,16 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
 
   const handleCanvasClick = (canvas, cards, onCardEdit, e) => {
     const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    const scaleX = canvas.width / rect.width
+    const scaleY = canvas.height / rect.height
+    const x = (e.clientX - rect.left) * scaleX
+    const y = (e.clientY - rect.top) * scaleY
 
     // Get canvas dimensions
     const width = canvasSize.width / 2
     const height = canvasSize.height
     const centerX = width / 2
+    const circleRadius = getFitCircleRadius(CIRCLE_RADIUS, width, height, CARD_WIDTH)
     const centerY = height / 2
 
     // Get visible cards and reorder for circle
@@ -186,7 +194,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
 
     // Calculate positions and find clicked card
     const angleStep = (2 * Math.PI) / totalVisible
-    const offsetRadius = CIRCLE_RADIUS + (CARD_WIDTH / 2) * 3/4
+    const offsetRadius = circleRadius + (CARD_WIDTH / 2) * 3/4
 
     for (let i = 0; i < reorderedCards.length; i++) {
       const card = reorderedCards[i]
