@@ -54,11 +54,24 @@
     font-size: 0.8rem;
   }
 
-  .canvasContainer {
-    min-height: 360px;
+  .canvasContainer,
+  .canvasContainer.stacked {
+    flex-direction: column-reverse;
+    flex: none;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+    padding: 0.35rem 0 0.75rem;
+    min-height: 0;
   }
 
-  .canvas {
-    min-height: 360px;
+  .canvas,
+  .canvasContainer.stacked .canvas {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 }

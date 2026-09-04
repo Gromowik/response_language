@@ -14,17 +14,26 @@ const CIRCLE_RADIUS = 200 // Smaller radius for side-by-side layout
 export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdit, onRightCardEdit }) {
   const leftCanvasRef = useRef(null)
   const rightCanvasRef = useRef(null)
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600, stacked: false })
 
   // Update canvas size on window resize
   useEffect(() => {
     const updateSize = () => {
+      const stacked = window.innerWidth <= 768
       const { width, height } = getFitCanvasSize({
         minDesktopWidth: 1200,
         minDesktopHeight: 600,
-        chrome: 180,
+        chrome: stacked ? 200 : 180,
+        breakpoint: 769,
       })
-      setCanvasSize({ width, height })
+
+      if (stacked) {
+        // Full-width wheels stacked vertically: avoid half-width squash/overlap
+        const wheelHeight = Math.min(width, Math.max(280, Math.floor((window.innerHeight - 200) / 2)))
+        setCanvasSize({ width, height: wheelHeight, stacked: true })
+      } else {
+        setCanvasSize({ width, height, stacked: false })
+      }
     }
 
     updateSize()
@@ -54,7 +63,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
     if (!canvas) return
 
     const ctx = canvas.getContext('2d')
-    const width = canvasSize.width / 2
+    const width = canvasSize.stacked ? canvasSize.width : canvasSize.width / 2
     const height = canvasSize.height
 
     canvas.width = width
@@ -179,7 +188,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
     const y = (e.clientY - rect.top) * scaleY
 
     // Get canvas dimensions
-    const width = canvasSize.width / 2
+    const width = canvasSize.stacked ? canvasSize.width : canvasSize.width / 2
     const height = canvasSize.height
     const centerX = width / 2
     const circleRadius = getFitCircleRadius(CIRCLE_RADIUS, width, height, CARD_WIDTH)
@@ -218,10 +227,10 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
         <span>Person 1: {leftCards.length} cards | Visible: {Math.min(MAX_VISIBLE, leftCards.length)}</span>
         <span>Person 2: {rightCards.length} cards | Visible: {Math.min(MAX_VISIBLE, rightCards.length)}</span>
       </div>
-      <div className={styles.canvasContainer}>
+      <div className={`${styles.canvasContainer} ${canvasSize.stacked ? styles.stacked : ''}`}>
         <canvas
           ref={leftCanvasRef}
-          className={styles.canvas}
+          className={`${styles.canvas} ${styles.canvasPerson1}`}
           onClick={(e) => handleCanvasClick(leftCanvasRef.current, leftCards, onLeftCardEdit, e)}
           onDoubleClick={(e) => {
             const visibleCards = getVisibleCards(leftCards)
@@ -233,7 +242,7 @@ export default function BothCircularTapes({ leftCards, rightCards, onLeftCardEdi
         />
         <canvas
           ref={rightCanvasRef}
-          className={styles.canvas}
+          className={`${styles.canvas} ${styles.canvasPerson2}`}
           onClick={(e) => handleCanvasClick(rightCanvasRef.current, rightCards, onRightCardEdit, e)}
           onDoubleClick={(e) => {
             const visibleCards = getVisibleCards(rightCards)
