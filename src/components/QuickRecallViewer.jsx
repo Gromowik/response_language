@@ -1,5 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
-import quickRecallSource from '../../public/quick_recall.md?raw'
+import { useState, useEffect } from 'react'
 import styles from './ReadmeViewer.module.css'
 
 function renderMarkdown(source) {
@@ -13,22 +12,55 @@ function renderMarkdown(source) {
 }
 
 export default function QuickRecallViewer() {
-  const [ready, setReady] = useState(
-    () => typeof window !== 'undefined' && Boolean(window.marked?.parse)
-  )
+  const [html, setHtml] = useState('<p>Загрузка…</p>')
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (ready) return
-    const id = window.setInterval(() => {
-      if (window.marked?.parse) {
-        setReady(true)
-        window.clearInterval(id)
-      }
-    }, 50)
-    return () => window.clearInterval(id)
-  }, [ready])
+    let cancelled = false
 
-  const html = useMemo(() => renderMarkdown(quickRecallSource), [ready])
+    const load = async () => {
+      try {
+        const waitForMarked = () =>
+          new Promise((resolve) => {
+            if (window.marked?.parse) {
+              resolve()
+              return
+            }
+            const id = window.setInterval(() => {
+              if (window.marked?.parse) {
+                window.clearInterval(id)
+                resolve()
+              }
+            }, 50)
+          })
+
+        const [response] = await Promise.all([
+          fetch('/quick_recall.md', { cache: 'no-cache' }),
+          waitForMarked(),
+        ])
+
+        if (!response.ok) {
+          throw new Error(`Не удалось загрузить quick_recall.md (${response.status})`)
+        }
+
+        const source = await response.text()
+        if (!cancelled) {
+          setHtml(renderMarkdown(source))
+          setError(null)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message || 'Ошибка загрузки')
+          setHtml('')
+        }
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className={styles.container}>
@@ -40,10 +72,14 @@ export default function QuickRecallViewer() {
           <code>RL/public/quick_recall.md</code>.
         </p>
       </header>
-      <article
-        className={styles.markdown}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      {error ? (
+        <p className={styles.lead}>{error}</p>
+      ) : (
+        <article
+          className={styles.markdown}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      )}
     </div>
   )
 }
