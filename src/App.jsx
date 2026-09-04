@@ -9,12 +9,13 @@ import BothCircularTapes from './components/BothCircularTapes'
 import PairedCircularTapes from './components/PairedCircularTapes'
 import Philosophy from './components/Philosophy'
 import ReadmeViewer from './components/ReadmeViewer'
+import QuickRecallViewer from './components/QuickRecallViewer'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('horizontal') // 'horizontal', 'horizontal2', 'vertical', 'leftVertical', 'bothVertical', 'circular', 'bothCircular', 'pairedCircular', 'philosophy', or 'readme'
+  const [currentPage, setCurrentPage] = useState('horizontal') // 'horizontal', 'horizontal2', 'vertical', 'leftVertical', 'bothVertical', 'circular', 'bothCircular', 'pairedCircular', 'philosophy', 'readme', or 'quickRecall'
   const [cards, setCards] = useState([])
   const [cardsPerson2, setCardsPerson2] = useState([]) // Cards for Person 2
   const [verticalCards, setVerticalCards] = useState([])
@@ -362,12 +363,18 @@ function App() {
             README
           </button>
           <button 
+            onClick={() => goToPage('quickRecall')}
+            className={`btn ${currentPage === 'quickRecall' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Quick Recall
+          </button>
+          <button 
             onClick={() => {
               setIsCreating(currentPage)
               setMobileNavOpen(false)
             }} 
             className="btn btn-primary"
-            disabled={currentPage === 'philosophy' || currentPage === 'readme'}
+            disabled={currentPage === 'philosophy' || currentPage === 'readme' || currentPage === 'quickRecall'}
           >
             + New Card
           </button>
@@ -474,6 +481,8 @@ function App() {
           <Philosophy />
         ) : currentPage === 'readme' ? (
           <ReadmeViewer />
+        ) : currentPage === 'quickRecall' ? (
+          <QuickRecallViewer />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}

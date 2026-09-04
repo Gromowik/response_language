@@ -16,6 +16,7 @@ React + Vite приложение для визуализации и управ�
 8. **Paired Circular** - две круговые ленты с соединенными парами объектов (шестеренки)
 9. **Philosophie** - страница с философией проекта
 10. **README** - чтение файла `README.md` прямо в приложении
+11. **Quick Recall** - быстрое напоминание сути и идей развития (`public/quick_recall.md`)
 
 ### Типы объектов
 
@@ -133,6 +134,7 @@ RL/src/
 │   ├── PairedCircularTapes.jsx # Две парные круговые ленты (шестеренки)
 │   ├── Philosophy.jsx          # Страница философии
 │   ├── ReadmeViewer.jsx        # Чтение README.md в приложении
+│   ├── QuickRecallViewer.jsx   # Быстрое напоминание (quick_recall.md)
 │   └── CardEditor.jsx          # Редактор карточек
 ├── utils/
 │   ├── cardStorage.js          # Утилиты для работы с карточками
