@@ -10,7 +10,7 @@ import PairedCircularTapes from './components/PairedCircularTapes'
 import Philosophy from './components/Philosophy'
 import ReadmeViewer from './components/ReadmeViewer'
 import QuickRecallViewer from './components/QuickRecallViewer'
-import ExchangeFieldViewer from './components/ExchangeFieldViewer'
+import ExchangeField from './components/ExchangeField'
 import DirectionsViewer from './components/DirectionsViewer'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
@@ -504,7 +504,7 @@ function App() {
         ) : currentPage === 'quickRecall' ? (
           <QuickRecallViewer />
         ) : currentPage === 'exchangeField' ? (
-          <ExchangeFieldViewer />
+          <ExchangeField />
         ) : currentPage === 'directions' ? (
           <DirectionsViewer />
         ) : (

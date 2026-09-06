@@ -11,7 +11,7 @@ function renderMarkdown(source) {
     .replace(/>/g, '&gt;')}</pre>`
 }
 
-export default function ExchangeFieldViewer() {
+export default function ExchangeFieldViewer({ embedded = false }) {
   const [html, setHtml] = useState('<p>Загрузка…</p>')
   const [error, setError] = useState(null)
 
@@ -63,15 +63,17 @@ export default function ExchangeFieldViewer() {
   }, [])
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <p className={styles.kicker}>Exchange field</p>
-        <h1 className={styles.title}>Поле обмена — TODO и разговор</h1>
-        <p className={styles.lead}>
-          План площадки встречи людей для обмена и конспект смысла —{' '}
-          <code>RL/public/exchange_field.md</code>. Сюда же дописываем идеи по ходу.
-        </p>
-      </header>
+    <div className={styles.container} style={embedded ? { padding: 0, maxWidth: 'none' } : undefined}>
+      {!embedded ? (
+        <header className={styles.header}>
+          <p className={styles.kicker}>Exchange field</p>
+          <h1 className={styles.title}>Поле обмена — TODO и разговор</h1>
+          <p className={styles.lead}>
+            План площадки встречи людей для обмена и конспект смысла —{' '}
+            <code>RL/public/exchange_field.md</code>. Сюда же дописываем идеи по ходу.
+          </p>
+        </header>
+      ) : null}
       {error ? (
         <p className={styles.lead}>{error}</p>
       ) : (
