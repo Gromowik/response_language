@@ -5,6 +5,10 @@
 
 const STORAGE_KEY = 'exchangeFieldPlayerCards'
 
+/** Cards you create in this browser belong to this person */
+export const LOCAL_PERSON_ID = 'local'
+export const LOCAL_PERSON_NAME = 'Я (локально)'
+
 export const PROJECTION_KINDS = [
   { id: 'base', label: 'Базовая' },
   { id: 'inTheme', label: 'В теме' },
@@ -15,12 +19,18 @@ export function projectionKindLabel(kind) {
   return PROJECTION_KINDS.find((k) => k.id === kind)?.label || 'В теме'
 }
 
+export function isOwnCard(card, personId = LOCAL_PERSON_ID) {
+  return (card?.personId || LOCAL_PERSON_ID) === personId
+}
+
 export function createEmptyPlayerCard(overrides = {}) {
   const now = Date.now()
   return {
     id: String(now),
     createdAt: now,
     updatedAt: now,
+    personId: LOCAL_PERSON_ID,
+    personName: LOCAL_PERSON_NAME,
     theme: '',
     projectionLabel: '',
     projectionKind: 'inTheme',
@@ -37,9 +47,12 @@ export function normalizePlayerCard(card) {
   const kind = PROJECTION_KINDS.some((k) => k.id === card.projectionKind)
     ? card.projectionKind
     : 'inTheme'
+  const personId = card.personId || LOCAL_PERSON_ID
   return {
     ...createEmptyPlayerCard(),
     ...card,
+    personId,
+    personName: card.personName || (personId === LOCAL_PERSON_ID ? LOCAL_PERSON_NAME : personId),
     projectionKind: kind,
     selectedForExchange: Boolean(card.selectedForExchange),
   }
@@ -51,10 +64,20 @@ export function loadPlayerCards() {
     if (!raw) return getDemoPlayerCards()
     const parsed = JSON.parse(raw)
     if (!Array.isArray(parsed)) return getDemoPlayerCards()
-    return parsed.map(normalizePlayerCard)
+    return ensureDemoOthers(parsed.map(normalizePlayerCard))
   } catch {
     return getDemoPlayerCards()
   }
+}
+
+/** If user already had local cards, still surface demo others for phase 4 */
+function ensureDemoOthers(cards) {
+  const demos = getDemoPlayerCards().filter((c) => !isOwnCard(c))
+  const next = [...cards]
+  demos.forEach((demo) => {
+    if (!next.some((c) => c.id === demo.id)) next.push(demo)
+  })
+  return next
 }
 
 export function savePlayerCards(cards) {
@@ -161,11 +184,31 @@ export function groupCardsByTheme(cards) {
     }))
 }
 
+export function ownCards(cards, personId = LOCAL_PERSON_ID) {
+  return cards.filter((c) => isOwnCard(c, personId))
+}
+
+export function othersCards(cards, personId = LOCAL_PERSON_ID) {
+  return cards.filter((c) => !isOwnCard(c, personId))
+}
+
+export function personLabel(cardOrId, cards = []) {
+  if (cardOrId && typeof cardOrId === 'object') {
+    return cardOrId.personName || cardOrId.personId || '—'
+  }
+  const id = String(cardOrId || '')
+  if (id === LOCAL_PERSON_ID) return LOCAL_PERSON_NAME
+  const found = cards.find((c) => c.personId === id)
+  return found?.personName || id || '—'
+}
+
 function getDemoPlayerCards() {
   const now = Date.now()
   return [
     normalizePlayerCard({
       id: 'demo-1',
+      personId: LOCAL_PERSON_ID,
+      personName: LOCAL_PERSON_NAME,
       createdAt: now - 86400000,
       updatedAt: now - 86400000,
       theme: 'Электромагнитные волны',
@@ -179,6 +222,8 @@ function getDemoPlayerCards() {
     }),
     normalizePlayerCard({
       id: 'demo-2',
+      personId: LOCAL_PERSON_ID,
+      personName: LOCAL_PERSON_NAME,
       createdAt: now - 3600000,
       updatedAt: now - 3600000,
       theme: 'Электромагнитные волны',
@@ -189,6 +234,34 @@ function getDemoPlayerCards() {
         'Сегодня хочется говорить мягче: не доказывать, а вместе смотреть, где в обычном дне уже есть «волна» — ритм, отклик, эхо.',
       selfVideoUrl: '',
       selectedForExchange: true,
+    }),
+    normalizePlayerCard({
+      id: 'demo-anna-1',
+      personId: 'demo-anna',
+      personName: 'Анна (демо)',
+      createdAt: now - 5000000,
+      updatedAt: now - 5000000,
+      theme: 'Электромагнитные волны',
+      projectionLabel: 'Свет как разговор',
+      projectionKind: 'inTheme',
+      selfBase: 'Люблю медленные разговоры и точные слова.',
+      self:
+        'Волны для меня — про то, как отклик доходит не сразу. Ищу человека, с кем можно обмениваться отражениями с паузой и вниманием.',
+      selectedForExchange: false,
+    }),
+    normalizePlayerCard({
+      id: 'demo-boris-1',
+      personId: 'demo-boris',
+      personName: 'Борис (демо)',
+      createdAt: now - 4000000,
+      updatedAt: now - 4000000,
+      theme: 'Музыка и ритм',
+      projectionLabel: 'Пульс дня',
+      projectionKind: 'today',
+      selfBase: '',
+      self:
+        'Слушаю город как партитуру. Хочу обменяться с кем-то, кто тоже слышит ритм в обычных вещах.',
+      selectedForExchange: false,
     }),
   ]
 }
