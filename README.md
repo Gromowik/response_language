@@ -18,6 +18,7 @@ React + Vite приложение для визуализации и управ�
 10. **README** - чтение файла `README.md` прямо в приложении
 11. **Quick Recall** - быстрое напоминание сути и идей развития (`public/quick_recall.md`)
 12. **Exchange Field** - TODO и разговор о поле встречи людей для обмена (`public/exchange_field.md`)
+13. **Directions** - направления развития по шагам (`public/directions_of_development.md`)
 
 ### Типы объектов
 
