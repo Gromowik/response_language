@@ -17,6 +17,7 @@ React + Vite приложение для визуализации и управ�
 9. **Philosophie** - страница с философией проекта
 10. **README** - чтение файла `README.md` прямо в приложении
 11. **Quick Recall** - быстрое напоминание сути и идей развития (`public/quick_recall.md`)
+12. **Exchange Field** - TODO и разговор о поле встречи людей для обмена (`public/exchange_field.md`)
 
 ### Типы объектов
 
@@ -135,6 +136,7 @@ RL/src/
 │   ├── Philosophy.jsx          # Страница философии
 │   ├── ReadmeViewer.jsx        # Чтение README.md в приложении
 │   ├── QuickRecallViewer.jsx   # Быстрое напоминание (quick_recall.md)
+│   ├── ExchangeFieldViewer.jsx # TODO / разговор о поле обмена
 │   └── CardEditor.jsx          # Редактор карточек
 ├── utils/
 │   ├── cardStorage.js          # Утилиты для работы с карточками
