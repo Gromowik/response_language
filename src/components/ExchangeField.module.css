@@ -192,7 +192,8 @@
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   width: 100%;
   box-sizing: border-box;
   padding: 0.7rem 0.8rem;
@@ -208,11 +209,113 @@
 }
 
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   outline: none;
   border-color: #4ecdc4;
   box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.15);
 }
+
+.searchPanel {
+  background: #fff;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  padding: 0.9rem 1rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.searchModes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.themeGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.themeGroupHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+
+.themeGroupTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #102a43;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.themeCount {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #627d98;
+  background: #e8eef4;
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.cardRow {
+  display: flex;
+  gap: 0.4rem;
+  align-items: stretch;
+}
+
+.selectToggle {
+  flex: 0 0 42px;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  background: #fff;
+  color: #829ab1;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.selectToggleOn {
+  color: #d4a017;
+  border-color: #f0d78c;
+  background: #fffbeb;
+}
+
+.cardRow .card {
+  flex: 1;
+}
+
+.relatedList {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.linkButton {
+  border: none;
+  background: none;
+  color: #0b6faf;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.linkButton:hover {
+  text-decoration: underline;
+}
+
 
 .error {
   color: #c0392b;
