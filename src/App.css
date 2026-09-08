@@ -116,6 +116,11 @@ body {
   text-decoration: none;
 }
 
+.app-footer code {
+  font-size: 0.9em;
+  color: #d6dee6;
+}
+
 .app-footer a:hover {
   text-decoration: underline;
 }

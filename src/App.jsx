@@ -590,9 +590,20 @@ function App() {
         <p className="app-footer-note">
           Мобильная версия в разработке. На телефоне интерфейс пока упрощённый; удобнее смотреть с компьютера.
         </p>
-        <p>Автор: Serge Gromowik</p>
+        <p>Автор: Serge Gromowik · © 2026 · All Rights Reserved</p>
         <p>
-          Кто желает участвовать в проекте, может обращаться на почту{' '}
+          Некоммерческое использование — бесплатно (личное / учебное). Коммерческое — по согласованию.
+          Подробнее: <code>LICENSE</code>, <code>TERMS.md</code>.
+        </p>
+        <p>
+          По вопросам коммерческого использования, приобретения лицензии или заказной доработки
+          обращайтесь:{' '}
+          <a href="mailto:serge.gromowik@gmail.com?subject=Commercial%20license%20%2F%20Object%20Tape%20%2F%20Response%20Language">
+            serge.gromowik@gmail.com
+          </a>
+        </p>
+        <p>
+          Участие в проекте (идеи, тесты):{' '}
           <a href="mailto:serge.gromowik@gmail.com">serge.gromowik@gmail.com</a>
         </p>
         <p>

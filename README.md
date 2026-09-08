@@ -416,12 +416,20 @@ npm run dev
 
 ---
 
-## Автор и контакты
+## Автор, лицензия и контакты
 
 **Мобильная версия в разработке.** На телефоне интерфейс пока упрощённый; удобнее пользоваться с компьютера. Проект объёмный — к более удобному мобильному UI вернёмся позже.
 
-**Автор:** Serge Gromowik
+**Автор:** Serge Gromowik  
+**Права:** © 2026 · All Rights Reserved (см. [`LICENSE`](./LICENSE))  
+**Условия:** [`TERMS.md`](./TERMS.md) — Non-Commercial Use (бесплатно) и Commercial Use (по согласованию)
 
-Кто желает участвовать в проекте, может обращаться на почту: [serge.gromowik@gmail.com](mailto:serge.gromowik@gmail.com)
+**Некоммерческое использование** (личное, учебное, исследовательское) — бесплатно, с сохранением авторства.
+
+**Коммерческое использование**, приобретение лицензии или заказная доработка — только по согласованию. Пишите:
+
+[serge.gromowik@gmail.com](mailto:serge.gromowik@gmail.com?subject=Commercial%20license%20%2F%20Object%20Tape%20%2F%20Response%20Language)
+
+Участие в проекте (идеи, тесты, некоммерческое сотрудничество): [serge.gromowik@gmail.com](mailto:serge.gromowik@gmail.com)
 
 **Связанный проект:** [models-for-psychology.vercel.app](https://models-for-psychology.vercel.app/)

@@ -2,6 +2,8 @@
   "name": "rl",
   "private": true,
   "version": "0.0.0",
+  "license": "UNLICENSED",
+  "author": "Serge Gromowik <serge.gromowik@gmail.com>",
   "type": "module",
   "scripts": {
     "dev": "vite",
