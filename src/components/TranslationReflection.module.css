@@ -114,11 +114,15 @@
 .hint {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
-  color: #627d98;
+  color: #334e68;
 }
 
 .hint code {
   font-size: 0.85em;
+  color: #245b4a;
+  background: #eef6f3;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
 }
 
 .reflection {
@@ -130,7 +134,9 @@
   border-radius: 4px;
   font: inherit;
   line-height: 1.5;
+  color: #1f2933;
   background: #f8fafc;
+  color-scheme: light;
   resize: vertical;
 }
 
@@ -225,7 +231,9 @@
   border: 1px solid #d9e2ec;
   border-radius: 4px;
   font: inherit;
+  color: #1f2933;
   background: #fff;
+  color-scheme: light;
 }
 
 .row {
