@@ -19,6 +19,8 @@ React + Vite приложение для визуализации и управ�
 11. **Quick Recall** - быстрое напоминание сути и идей развития (`public/quick_recall.md`)
 12. **Exchange Field** - поле обмена: карточки игрока тема↔Я (фаза 1) + TODO/разговор (`public/exchange_field.md`)
 13. **Directions** - направления развития по шагам (`public/directions_of_development.md`)
+14. **Reflection** - размышление → карточки и трансляции (подготовка плоскости)
+15. **Seeds** - сборник сидов / упражнений (`public/work/catalog.json`)
 
 ### Типы объектов
 

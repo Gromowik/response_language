@@ -13,6 +13,7 @@ import QuickRecallViewer from './components/QuickRecallViewer'
 import ExchangeField from './components/ExchangeField'
 import DirectionsViewer from './components/DirectionsViewer'
 import TranslationReflection from './components/TranslationReflection'
+import WorkSeeds from './components/WorkSeeds'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
@@ -389,6 +390,12 @@ function App() {
           >
             Reflection
           </button>
+          <button
+            onClick={() => goToPage('seeds')}
+            className={`btn ${currentPage === 'seeds' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Seeds
+          </button>
           <button 
             onClick={() => {
               setIsCreating(currentPage)
@@ -401,7 +408,8 @@ function App() {
               currentPage === 'quickRecall' ||
               currentPage === 'exchangeField' ||
               currentPage === 'directions' ||
-              currentPage === 'reflection'
+              currentPage === 'reflection' ||
+              currentPage === 'seeds'
             }
           >
             + New Card
@@ -517,6 +525,8 @@ function App() {
           <DirectionsViewer />
         ) : currentPage === 'reflection' ? (
           <TranslationReflection />
+        ) : currentPage === 'seeds' ? (
+          <WorkSeeds />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}
