@@ -14,6 +14,7 @@ import ExchangeField from './components/ExchangeField'
 import DirectionsViewer from './components/DirectionsViewer'
 import TranslationReflection from './components/TranslationReflection'
 import WorkSeeds from './components/WorkSeeds'
+import CloudModels from './components/CloudModels'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
@@ -396,6 +397,12 @@ function App() {
           >
             Seeds
           </button>
+          <button
+            onClick={() => goToPage('cloudModels')}
+            className={`btn ${currentPage === 'cloudModels' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Cloud Models
+          </button>
           <button 
             onClick={() => {
               setIsCreating(currentPage)
@@ -409,7 +416,8 @@ function App() {
               currentPage === 'exchangeField' ||
               currentPage === 'directions' ||
               currentPage === 'reflection' ||
-              currentPage === 'seeds'
+              currentPage === 'seeds' ||
+              currentPage === 'cloudModels'
             }
           >
             + New Card
@@ -527,6 +535,8 @@ function App() {
           <TranslationReflection />
         ) : currentPage === 'seeds' ? (
           <WorkSeeds />
+        ) : currentPage === 'cloudModels' ? (
+          <CloudModels />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}

@@ -21,6 +21,7 @@ React + Vite приложение для визуализации и управ�
 13. **Directions** - направления развития по шагам (`public/directions_of_development.md`)
 14. **Reflection** - размышление → карточки и трансляции (подготовка плоскости)
 15. **Seeds** - сборник сидов / упражнений (`public/work/catalog.json`)
+16. **Cloud Models** - модели облака: сжатые схемы для своих трансляций (`public/work/cloud_models.json`)
 
 ### Типы объектов
 
