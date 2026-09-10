@@ -56,6 +56,33 @@
   color: #102a43;
 }
 
+.group {
+  margin-bottom: 1.1rem;
+}
+
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.kindBadge,
+.kindBadgeLarge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #245b4a;
+  background: #e8f3ee;
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  width: fit-content;
+}
+
+.kindBadgeLarge {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+}
+
 .list {
   list-style: none;
   margin: 0;

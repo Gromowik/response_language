@@ -102,10 +102,10 @@ export default function WorkSeeds() {
         <h1 className={styles.title}>Сборник сидов</h1>
         <p className={styles.lead}>
           Важный формат обучения мышлению на языке трансляций: обмениваться с ИИ, готовить
-          почву, к которой можно вернуться всегда — и при желании или необходимости собрать
-          на её основе своё, более детальное поле карточек (на странице{' '}
-          <strong>Reflection</strong>), на свой вкус. Сжатые схемы — вкладка{' '}
-          <strong>Cloud Models</strong>. Это не поле обмена людей, а запас смыслов и упражнений.
+          почву, к которой можно вернуться всегда — и при желании собрать своё поле карточек на{' '}
+          <strong>Reflection</strong>. Здесь два класса: <strong>сиды</strong> (разборы) и{' '}
+          <strong>истории</strong> (треки трансляций от своего лица, опора на модели облака).
+          Сжатые схемы — вкладка <strong>Cloud Models</strong>.
         </p>
       </header>
 
@@ -114,38 +114,50 @@ export default function WorkSeeds() {
 
       <div className={styles.layout}>
         <aside className={styles.sidebar}>
-          <h2 className={styles.sideTitle}>Сиды</h2>
+          {['seed', 'history'].map((kind) => {
+            const items = catalog.filter((c) => (c.kind || 'seed') === kind)
+            if (!items.length) return null
+            return (
+              <div key={kind} className={styles.group}>
+                <h2 className={styles.sideTitle}>
+                  {kind === 'history' ? 'Истории' : 'Сиды'}
+                </h2>
+                <ul className={styles.list}>
+                  {items.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className={`${styles.seedBtn} ${
+                          item.id === selectedId ? styles.seedBtnActive : ''
+                        }`}
+                        onClick={() => setSelectedId(item.id)}
+                      >
+                        <span className={styles.kindBadge}>
+                          {kind === 'history' ? 'история' : 'сид'}
+                        </span>
+                        <span className={styles.seedTitle}>{item.title}</span>
+                        {item.subtitle ? (
+                          <span className={styles.seedSub}>{item.subtitle}</span>
+                        ) : null}
+                        {item.tags?.length ? (
+                          <span className={styles.tags}>
+                            {item.tags.map((t) => (
+                              <span key={t} className={styles.tag}>
+                                {t}
+                              </span>
+                            ))}
+                          </span>
+                        ) : null}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          })}
           {catalog.length === 0 && !loading ? (
             <p className={styles.hint}>Каталог пуст. Добавьте записи в public/work/catalog.json.</p>
-          ) : (
-            <ul className={styles.list}>
-              {catalog.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className={`${styles.seedBtn} ${
-                      item.id === selectedId ? styles.seedBtnActive : ''
-                    }`}
-                    onClick={() => setSelectedId(item.id)}
-                  >
-                    <span className={styles.seedTitle}>{item.title}</span>
-                    {item.subtitle ? (
-                      <span className={styles.seedSub}>{item.subtitle}</span>
-                    ) : null}
-                    {item.tags?.length ? (
-                      <span className={styles.tags}>
-                        {item.tags.map((t) => (
-                          <span key={t} className={styles.tag}>
-                            {t}
-                          </span>
-                        ))}
-                      </span>
-                    ) : null}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+          ) : null}
         </aside>
 
         <section className={styles.reader}>
@@ -153,6 +165,9 @@ export default function WorkSeeds() {
             <>
               <div className={styles.readerHead}>
                 <div>
+                  <p className={styles.kindBadgeLarge}>
+                    {(selected.kind || 'seed') === 'history' ? 'история' : 'сид'}
+                  </p>
                   <h2 className={styles.readerTitle}>{selected.title}</h2>
                   {selected.hint ? <p className={styles.hint}>{selected.hint}</p> : null}
                   <p className={styles.path}>
@@ -166,7 +181,7 @@ export default function WorkSeeds() {
               />
             </>
           ) : (
-            <p className={styles.hint}>Выберите сид слева.</p>
+            <p className={styles.hint}>Выберите сид или историю слева.</p>
           )}
         </section>
       </div>
