@@ -15,6 +15,7 @@ import DirectionsViewer from './components/DirectionsViewer'
 import TranslationReflection from './components/TranslationReflection'
 import WorkSeeds from './components/WorkSeeds'
 import CloudModels from './components/CloudModels'
+import Repeater from './components/Repeater'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
@@ -403,6 +404,12 @@ function App() {
           >
             Cloud Models
           </button>
+          <button
+            onClick={() => goToPage('repeater')}
+            className={`btn ${currentPage === 'repeater' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Repeater
+          </button>
           <button 
             onClick={() => {
               setIsCreating(currentPage)
@@ -417,7 +424,8 @@ function App() {
               currentPage === 'directions' ||
               currentPage === 'reflection' ||
               currentPage === 'seeds' ||
-              currentPage === 'cloudModels'
+              currentPage === 'cloudModels' ||
+              currentPage === 'repeater'
             }
           >
             + New Card
@@ -537,6 +545,8 @@ function App() {
           <WorkSeeds />
         ) : currentPage === 'cloudModels' ? (
           <CloudModels />
+        ) : currentPage === 'repeater' ? (
+          <Repeater />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}
