@@ -11,17 +11,34 @@ function renderMarkdown(source) {
     .replace(/>/g, '&gt;')}</pre>`
 }
 
-const WAY_PATH = '/work/way.md'
+const PATHS = [
+  {
+    id: 'way',
+    label: 'Путь (way.md)',
+    path: '/work/way.md',
+    hint:
+      'Первая беседа-путь: работа/мощность, рычаг, зацепление, истории. Файл: /work/way.md',
+  },
+  {
+    id: 'way3',
+    label: 'Облако 2 (way_3.md)',
+    path: '/work/way_3.md',
+    hint:
+      'Целиком: столкновение/пролёт, каналы энергии, колесо, шуруп, О↔Ц. Сначала подход целиком — модели разберём детальнее позже. Файл: /work/way_3.md',
+  },
+]
 
 export default function CloudModels() {
   const [models, setModels] = useState([])
   const [selectedId, setSelectedId] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState('models') // models | way
-  const [wayHtml, setWayHtml] = useState('')
-  const [wayError, setWayError] = useState(null)
-  const [wayLoading, setWayLoading] = useState(false)
+  const [tab, setTab] = useState('models') // models | way | way3
+  const [docHtml, setDocHtml] = useState('')
+  const [docError, setDocError] = useState(null)
+  const [docLoading, setDocLoading] = useState(false)
+
+  const activePath = PATHS.find((p) => p.id === tab) || null
 
   useEffect(() => {
     let cancelled = false
@@ -51,11 +68,11 @@ export default function CloudModels() {
   }, [])
 
   useEffect(() => {
-    if (tab !== 'way') return
+    if (!activePath) return
     let cancelled = false
-    const loadWay = async () => {
-      setWayLoading(true)
-      setWayHtml('<p>Загрузка…</p>')
+    const loadDoc = async () => {
+      setDocLoading(true)
+      setDocHtml('<p>Загрузка…</p>')
       try {
         const waitForMarked = () =>
           new Promise((resolve) => {
@@ -72,31 +89,31 @@ export default function CloudModels() {
           })
 
         const [response] = await Promise.all([
-          fetch(WAY_PATH, { cache: 'no-cache' }),
+          fetch(activePath.path, { cache: 'no-cache' }),
           waitForMarked(),
         ])
         if (!response.ok) {
-          throw new Error(`Не удалось загрузить ${WAY_PATH} (${response.status})`)
+          throw new Error(`Не удалось загрузить ${activePath.path} (${response.status})`)
         }
         const source = await response.text()
         if (!cancelled) {
-          setWayHtml(renderMarkdown(source))
-          setWayError(null)
+          setDocHtml(renderMarkdown(source))
+          setDocError(null)
         }
       } catch (err) {
         if (!cancelled) {
-          setWayError(err.message || 'Ошибка загрузки пути')
-          setWayHtml('')
+          setDocError(err.message || 'Ошибка загрузки')
+          setDocHtml('')
         }
       } finally {
-        if (!cancelled) setWayLoading(false)
+        if (!cancelled) setDocLoading(false)
       }
     }
-    loadWay()
+    loadDoc()
     return () => {
       cancelled = true
     }
-  }, [tab])
+  }, [activePath])
 
   const selected = models.find((m) => m.id === selectedId) || null
 
@@ -106,9 +123,10 @@ export default function CloudModels() {
         <p className={styles.kicker}>Cloud models · модели облака</p>
         <h1 className={styles.title}>Модели облака</h1>
         <p className={styles.lead}>
-          Сжатый каркас схем — и рядом весь <strong>путь беседы</strong> (
-          <code>way.md</code>), чтобы видеть связанность теории на практике: как из
-          размышления вырастают модели, сиды и истории.
+          Сжатый каркас уже разобранных схем — и целые тексты-пути рядом:{' '}
+          <strong>way.md</strong>, <strong>way_3.md</strong>. Новый слой лучше сначала
+          прочитать целиком (подход ярче в связке), потом уточнять в отдельные модели — у
+          каждого по-своему.
         </p>
       </header>
 
@@ -120,26 +138,28 @@ export default function CloudModels() {
         >
           Модели
         </button>
-        <button
-          type="button"
-          className={`${styles.tab} ${tab === 'way' ? styles.tabActive : ''}`}
-          onClick={() => setTab('way')}
-        >
-          Путь (way.md)
-        </button>
+        {PATHS.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            className={`${styles.tab} ${tab === p.id ? styles.tabActive : ''}`}
+            onClick={() => setTab(p.id)}
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
-      {tab === 'way' ? (
+      {activePath ? (
         <section className={styles.wayPanel}>
           <p className={styles.hint}>
-            Полная беседа-путь: от работы/мощности и первых трансляций через две модели
-            рычага к третьей и к идее историй. Файл: <code>{WAY_PATH}</code>
-            {wayLoading ? ' · загрузка…' : ''}
+            {activePath.hint}
+            {docLoading ? ' · загрузка…' : ''}
           </p>
-          {wayError ? <p className={styles.error}>{wayError}</p> : null}
+          {docError ? <p className={styles.error}>{docError}</p> : null}
           <article
             className={styles.markdown}
-            dangerouslySetInnerHTML={{ __html: wayHtml }}
+            dangerouslySetInnerHTML={{ __html: docHtml }}
           />
         </section>
       ) : (
@@ -150,6 +170,10 @@ export default function CloudModels() {
           <div className={styles.layout}>
             <aside className={styles.sidebar}>
               <h2 className={styles.sideTitle}>Список</h2>
+              <p className={styles.hint} style={{ marginTop: 0 }}>
+                Пока разобраны модели первого облака (рычаг / зацепление). Облако из way_3 —
+                следующим шагом.
+              </p>
               <ul className={styles.list}>
                 {models.map((m) => (
                   <li key={m.id}>
@@ -222,9 +246,9 @@ export default function CloudModels() {
                         ))}
                       </ul>
                       <p className={styles.hint}>
-                        Полный путь беседы — вкладка <strong>Путь (way.md)</strong> на этой
-                        странице. Сиды и истории — <strong>Seeds</strong>. Карточки —{' '}
-                        <strong>Reflection</strong>.
+                        Полные пути — вкладки <strong>Путь</strong> и{' '}
+                        <strong>Облако 2</strong>. Сиды и истории — <strong>Seeds</strong>.
+                        Карточки — <strong>Reflection</strong>.
                       </p>
                     </>
                   ) : null}
