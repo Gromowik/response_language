@@ -540,7 +540,7 @@ function App() {
         ) : currentPage === 'directions' ? (
           <DirectionsViewer />
         ) : currentPage === 'reflection' ? (
-          <TranslationReflection />
+          <TranslationReflection onNavigate={goToPage} />
         ) : currentPage === 'seeds' ? (
           <WorkSeeds />
         ) : currentPage === 'cloudModels' ? (

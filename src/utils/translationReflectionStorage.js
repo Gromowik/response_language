@@ -123,6 +123,31 @@ export function outgoingTranslations(workspace, objectId) {
   return workspace.translations.filter((t) => t.fromId === objectId)
 }
 
+/** Flat list of translations, sorted for the «поле трансляций» view */
+export function listTranslationsSorted(workspace, mode = 'importance') {
+  const rows = workspace.translations.map((t) => ({
+    ...t,
+    fromName: findObject(workspace, t.fromId)?.name || '—',
+    toName: findObject(workspace, t.toId)?.name || '—',
+    fromPower: objectPower(workspace, t.fromId),
+  }))
+  if (mode === 'power') {
+    return rows.sort(
+      (a, b) =>
+        b.fromPower - a.fromPower ||
+        (b.importance || 0) - (a.importance || 0) ||
+        a.fromName.localeCompare(b.fromName, 'ru')
+    )
+  }
+  // importance first (личное / взвешенное)
+  return rows.sort(
+    (a, b) =>
+      (b.importance || 0) - (a.importance || 0) ||
+      b.fromPower - a.fromPower ||
+      a.fromName.localeCompare(b.fromName, 'ru')
+  )
+}
+
 export function findObject(workspace, id) {
   return workspace.objects.find((o) => o.id === id) || null
 }
@@ -330,6 +355,43 @@ export function getSeedWorkspace(reflectionText = DEFAULT_SEED_REFLECTION) {
       'второе колесо → скорость подъёма груза падает',
       'manifest',
       0.9
+    ),
+    // 18.09.26 — лично важное: что касается «я» и груза-результата
+    tr(ids.me, ids.workDone, 'я → та же сделанная работа, просто медленней', 'constant', 1),
+    tr(
+      ids.me,
+      ids.powerTransfer,
+      'я → мощность меньше при увеличении рычага',
+      'change',
+      1
+    ),
+    tr(
+      ids.me,
+      ids.powerFeel,
+      'я → рычаг стало двигать легче с той же скоростью',
+      'change',
+      1
+    ),
+    tr(
+      ids.load,
+      ids.liftSpeed,
+      'груз → движется медленней при повышении радиуса рычага',
+      'change',
+      1
+    ),
+    tr(
+      ids.load,
+      ids.workDone,
+      'груз → работа та же, но сделанная медленней',
+      'constant',
+      1
+    ),
+    tr(
+      ids.load,
+      ids.powerTransfer,
+      'груз → мощность меньше при увеличении рычага',
+      'change',
+      1
     ),
   ]
 

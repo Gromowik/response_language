@@ -15,19 +15,22 @@ import {
   outgoingTranslations,
   findObject,
   kindLabel,
+  listTranslationsSorted,
 } from '../utils/translationReflectionStorage'
 
 function formatPower(n) {
   return (Math.round(n * 100) / 100).toFixed(2)
 }
 
-export default function TranslationReflection() {
+export default function TranslationReflection({ onNavigate }) {
   const [workspace, setWorkspace] = useState(() => loadWorkspace())
   const [selectedId, setSelectedId] = useState(null)
   const [draftObject, setDraftObject] = useState(null)
   const [draftTranslation, setDraftTranslation] = useState(null)
   const [flash, setFlash] = useState('')
   const [focusMode, setFocusMode] = useState(false)
+  const [trSort, setTrSort] = useState('importance') // importance | power
+  const [showTrField, setShowTrField] = useState(true)
 
   useEffect(() => {
     saveWorkspace(workspace)
@@ -55,6 +58,11 @@ export default function TranslationReflection() {
     })
     return sortedObjects.filter((o) => related.has(o.id))
   }, [sortedObjects, focusMode, selectedId, workspace.translations])
+
+  const translationField = useMemo(
+    () => listTranslationsSorted(workspace, trSort),
+    [workspace, trSort]
+  )
 
   const showFlash = (msg) => {
     setFlash(msg)
@@ -159,13 +167,103 @@ export default function TranslationReflection() {
         <h1 className={styles.title}>Размышление → трансляции</h1>
         <p className={styles.lead}>
           Среда для перевода мысли в карточки объектов и направленные связи{' '}
-          <strong>A → B</strong>. Это не поле обмена людей, а подготовительный слой
-          тематической плоскости: что сохраняется, что меняется, что проявляется ярко.
-          Почва для упражнений — вкладка <strong>Seeds</strong> (сборник сидов).
+          <strong>A → B</strong>. Ниже — поле всех трансляций (сортировка по важности или по
+          мощности источника). Почва сидов — отдельное поле.
         </p>
+        <nav className={styles.topLinks} aria-label="Связанные поля">
+          {onNavigate ? (
+            <>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('seeds')}
+              >
+                → Поле сидов (Seeds)
+              </button>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('cloudModels')}
+              >
+                → Модели облака
+              </button>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('repeater')}
+              >
+                → Повторитель
+              </button>
+            </>
+          ) : (
+            <span className={styles.hint}>Откройте вкладку Seeds в меню приложения.</span>
+          )}
+        </nav>
       </header>
 
       {flash ? <p className={styles.flash}>{flash}</p> : null}
+
+      <section className={styles.trField}>
+        <div className={styles.trFieldHead}>
+          <h2 className={styles.sectionTitle}>Поле трансляций</h2>
+          <div className={styles.row}>
+            <button
+              type="button"
+              className={`${styles.buttonGhost} ${trSort === 'importance' ? styles.toggleOn : ''}`}
+              onClick={() => setTrSort('importance')}
+            >
+              По важности
+            </button>
+            <button
+              type="button"
+              className={`${styles.buttonGhost} ${trSort === 'power' ? styles.toggleOn : ''}`}
+              onClick={() => setTrSort('power')}
+            >
+              По мощности источника
+            </button>
+            <button
+              type="button"
+              className={styles.buttonGhost}
+              onClick={() => setShowTrField((v) => !v)}
+            >
+              {showTrField ? 'Свернуть' : 'Показать'}
+            </button>
+          </div>
+        </div>
+        <p className={styles.hint}>
+          Сверху — то, что помечено важнее (личное «я» / груз-результат) или что копится по
+          мощности. Служебные и черновые тоже видны, но не закрывают важное.
+        </p>
+        {showTrField ? (
+          translationField.length === 0 ? (
+            <div className={styles.empty}>Пока нет трансляций. Засейте пример или добавьте связи.</div>
+          ) : (
+            <ul className={styles.trFieldList}>
+              {translationField.map((t) => (
+                <li key={t.id} className={styles.trFieldItem}>
+                  <button
+                    type="button"
+                    className={styles.trFieldBtn}
+                    onClick={() => {
+                      setSelectedId(t.fromId)
+                      setDraftTranslation({ ...t })
+                      setDraftObject(null)
+                    }}
+                  >
+                    <span className={styles.trFieldArrow}>
+                      <strong>{t.fromName}</strong> → <strong>{t.toName}</strong>
+                    </span>
+                    <span className={styles.kind}>{kindLabel(t.kind)}</span>
+                    <span className={styles.imp}>важн. {formatPower(t.importance)}</span>
+                    <span className={styles.power}>P ист. {formatPower(t.fromPower)}</span>
+                    {t.note ? <span className={styles.trFieldNote}>{t.note}</span> : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )
+        ) : null}
+      </section>
 
       <div className={styles.toolbar}>
         <button type="button" className={styles.button} onClick={handleReseed}>
