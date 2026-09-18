@@ -16,6 +16,7 @@ import TranslationReflection from './components/TranslationReflection'
 import WorkSeeds from './components/WorkSeeds'
 import CloudModels from './components/CloudModels'
 import Repeater from './components/Repeater'
+import VisualModel from './components/VisualModel'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
@@ -410,6 +411,12 @@ function App() {
           >
             Repeater
           </button>
+          <button
+            onClick={() => goToPage('visualModel')}
+            className={`btn ${currentPage === 'visualModel' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Visual Model
+          </button>
           <button 
             onClick={() => {
               setIsCreating(currentPage)
@@ -425,7 +432,8 @@ function App() {
               currentPage === 'reflection' ||
               currentPage === 'seeds' ||
               currentPage === 'cloudModels' ||
-              currentPage === 'repeater'
+              currentPage === 'repeater' ||
+              currentPage === 'visualModel'
             }
           >
             + New Card
@@ -547,6 +555,8 @@ function App() {
           <CloudModels />
         ) : currentPage === 'repeater' ? (
           <Repeater />
+        ) : currentPage === 'visualModel' ? (
+          <VisualModel onNavigate={goToPage} />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}

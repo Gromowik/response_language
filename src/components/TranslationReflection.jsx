@@ -194,6 +194,13 @@ export default function TranslationReflection({ onNavigate }) {
               >
                 → Повторитель
               </button>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('visualModel')}
+              >
+                → Визуальная модель
+              </button>
             </>
           ) : (
             <span className={styles.hint}>Откройте вкладку Seeds в меню приложения.</span>
