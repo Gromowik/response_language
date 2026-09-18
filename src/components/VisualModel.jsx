@@ -339,23 +339,31 @@ export default function VisualModel({ onNavigate }) {
                 <text x="278" y="52" className={styles.svgLabel}>
                   рычаг (я)
                 </text>
-                {/* rope + load */}
+                {/* chain always from rightmost point of wrap drum (160+22, 100) */}
+                <circle cx="182" cy="100" r="3.5" fill="#0b6faf" />
                 <g
-                  className={styles.animLoad}
+                  className={styles.animRope}
                   style={{
-                    transform: raised ? 'translateY(-70px)' : 'translateY(0)',
+                    transform: raised ? 'scaleY(0.39)' : 'scaleY(1)',
                   }}
                 >
                   <line
-                    x1="160"
-                    y1="122"
-                    x2="160"
-                    y2="146"
+                    x1="182"
+                    y1="100"
+                    x2="182"
+                    y2="162"
                     stroke="#627d98"
                     strokeWidth="2"
                   />
-                  <rect x="145" y="146" width="30" height="28" rx="3" fill="#8B4513" />
-                  <text x="200" y="164" className={styles.svgLabel}>
+                </g>
+                <g
+                  className={styles.animLoad}
+                  style={{
+                    transform: raised ? 'translateY(-38px)' : 'translateY(0)',
+                  }}
+                >
+                  <rect x="167" y="162" width="30" height="28" rx="3" fill="#8B4513" />
+                  <text x="222" y="180" className={styles.svgLabel}>
                     груз {raised ? '(поднято)' : '(внизу)'}
                   </text>
                 </g>

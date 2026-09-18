@@ -219,6 +219,12 @@
   font-family: system-ui, sans-serif;
 }
 
+.animRope {
+  transition: transform 0.85s ease;
+  transform-box: view-box;
+  transform-origin: 182px 100px;
+}
+
 .animLoad {
   transition: transform 0.85s ease;
   transform-box: fill-box;
