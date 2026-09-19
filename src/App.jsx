@@ -17,6 +17,8 @@ import WorkSeeds from './components/WorkSeeds'
 import CloudModels from './components/CloudModels'
 import Repeater from './components/Repeater'
 import VisualModel from './components/VisualModel'
+import RingDemo from './components/RingDemo'
+import HfCenters from './components/HfCenters'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
@@ -417,6 +419,18 @@ function App() {
           >
             Visual Model
           </button>
+          <button
+            onClick={() => goToPage('ringDemo')}
+            className={`btn ${currentPage === 'ringDemo' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            Ring Demo
+          </button>
+          <button
+            onClick={() => goToPage('hfCenters')}
+            className={`btn ${currentPage === 'hfCenters' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            HF Centers
+          </button>
           <button 
             onClick={() => {
               setIsCreating(currentPage)
@@ -433,7 +447,9 @@ function App() {
               currentPage === 'seeds' ||
               currentPage === 'cloudModels' ||
               currentPage === 'repeater' ||
-              currentPage === 'visualModel'
+              currentPage === 'visualModel' ||
+              currentPage === 'ringDemo' ||
+              currentPage === 'hfCenters'
             }
           >
             + New Card
@@ -557,6 +573,10 @@ function App() {
           <Repeater />
         ) : currentPage === 'visualModel' ? (
           <VisualModel onNavigate={goToPage} />
+        ) : currentPage === 'ringDemo' ? (
+          <RingDemo onNavigate={goToPage} />
+        ) : currentPage === 'hfCenters' ? (
+          <HfCenters onNavigate={goToPage} />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}

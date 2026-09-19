@@ -206,6 +206,13 @@ export default function VisualModel({ onNavigate }) {
         <nav className={styles.topLinks}>
           {onNavigate ? (
             <>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('ringDemo')}
+              >
+                → Ring Demo (O + R_O + трансляции)
+              </button>
               <button type="button" className={styles.topLink} onClick={() => onNavigate('seeds')}>
                 → Сид (Seeds / example.md)
               </button>

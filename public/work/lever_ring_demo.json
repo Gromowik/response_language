@@ -1,0 +1,169 @@
+{
+  "M": {
+    "id": "lever-host",
+    "O": {
+      "name": "Рычаг / механизм",
+      "description": "Первый сид: Visual Model + Ring Demo. O — суть понимания; внешнее кольцо R_O — папки по рекурсии; один динамический центр — положение груза."
+    },
+    "type": ["phenomenal", "host", "seed"],
+    "inclusions": {
+      "tags": ["lever", "example", "ring-demo"]
+    }
+  },
+  "L": [
+    {
+      "folders": {
+        "id": "mechanism",
+        "name": "Механизм (сид: рычаг)",
+        "children": [
+          { "id": "me", "name": "Я (приложение сил)", "children": [] },
+          {
+            "id": "wheel-common",
+            "name": "Общее колесо с грузом",
+            "children": [
+              { "id": "lever", "name": "Рычаг и радиус вращения", "children": [] },
+              {
+                "id": "wrap",
+                "name": "Колесо намотки (груз вверх)",
+                "children": [{ "id": "load", "name": "Сам груз", "children": [] }]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "R_O": [
+        {
+          "M": {
+            "id": "mechanism",
+            "O": {
+              "tastes": "Механизм",
+              "description": "Корень дерева мест — всё изделие в покое."
+            },
+            "type": ["R_O", "external", "folder"]
+          }
+        },
+        {
+          "M": {
+            "id": "me",
+            "O": {
+              "tastes": "Я (силы)",
+              "description": "Приложение сил на рычаге."
+            },
+            "type": ["R_O", "external", "folder"]
+          }
+        },
+        {
+          "M": {
+            "id": "wheel-common",
+            "O": {
+              "tastes": "Общее колесо",
+              "description": "Общее колесо с грузом."
+            },
+            "type": ["R_O", "external", "folder"]
+          }
+        },
+        {
+          "M": {
+            "id": "lever",
+            "O": {
+              "tastes": "Рычаг",
+              "description": "Рычаг и радиус вращения."
+            },
+            "type": ["R_O", "external", "folder"]
+          }
+        },
+        {
+          "M": {
+            "id": "wrap",
+            "O": {
+              "tastes": "Намотка",
+              "description": "Колесо намотки — точка, с которой висит груз."
+            },
+            "type": ["R_O", "external", "folder"]
+          }
+        },
+        {
+          "M": {
+            "id": "load",
+            "O": {
+              "tastes": "Груз",
+              "description": "Сам груз — узел на внешнем кольце (папка)."
+            },
+            "type": ["R_O", "external", "folder"]
+          }
+        }
+      ]
+    },
+    {
+      "centers": [
+        {
+          "M": {
+            "id": "center-load",
+            "O": {
+              "name": "Путь груза вверх / вниз",
+              "description": "Динамический центр: два состояния объекта, не переписывает папки.",
+              "states": ["down", "raised"]
+            },
+            "type": ["center", "dynamic"]
+          }
+        }
+      ]
+    },
+    {
+      "translations": [
+        {
+          "M": {
+            "id": "tr-load-path",
+            "O": {
+              "from": "груз внизу",
+              "to": "груз поднят",
+              "text": "Путь груза → проявление работы намотки"
+            },
+            "order": 1,
+            "importance": 1,
+            "targets": [{ "id": "load" }, { "id": "wrap" }, { "id": "center-load" }],
+            "type": ["translation", "beacon"]
+          }
+        },
+        {
+          "M": {
+            "id": "tr-me-work",
+            "O": {
+              "from": "я (касательная)",
+              "to": "работа на рычаге",
+              "text": "Я → работа через радиус рычага"
+            },
+            "order": 2,
+            "importance": 0.85,
+            "targets": [{ "id": "me" }, { "id": "lever" }],
+            "type": ["translation", "beacon"]
+          }
+        },
+        {
+          "M": {
+            "id": "tr-power",
+            "O": {
+              "from": "мощность входа",
+              "to": "мощность выхода",
+              "text": "Мощность входа ↔ выхода (общее колесо)"
+            },
+            "order": 3,
+            "importance": 0.9,
+            "targets": [{ "id": "wheel-common" }, { "id": "lever" }, { "id": "wrap" }],
+            "type": ["translation", "beacon"]
+          }
+        }
+      ]
+    },
+    {
+      "metrics": {
+        "IN": 7,
+        "OUT_base": 4,
+        "OUT_raised": 8,
+        "U_hint": "Резонанс, если груз поднят и в фокусе трансляция пути груза (tr-load-path)."
+      }
+    }
+  ]
+}

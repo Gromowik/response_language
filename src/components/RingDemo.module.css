@@ -1,0 +1,420 @@
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 2.5rem;
+  color: #1f2933;
+}
+
+.header {
+  margin-bottom: 1rem;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #627d98;
+}
+
+.title {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #243b53;
+}
+
+.lead {
+  margin: 0 0 0.75rem;
+  max-width: 42rem;
+  line-height: 1.45;
+  color: #486581;
+  font-size: 0.95rem;
+}
+
+.topLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.topLink,
+.button,
+.buttonGhost {
+  border: 1px solid #bcccdc;
+  background: #fff;
+  color: #334e68;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.topLink:hover,
+.buttonGhost:hover {
+  border-color: #3d7a6a;
+  color: #3d7a6a;
+}
+
+.button {
+  background: #3d7a6a;
+  border-color: #3d7a6a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(260px, 340px);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stagePanel,
+.sidePanel {
+  background: #f7faf9;
+  border: 1px solid #d9e2ec;
+  border-radius: 10px;
+  padding: 0.85rem 1rem 1.1rem;
+}
+
+.layerTitle {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: #243b53;
+}
+
+.hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  color: #627d98;
+  line-height: 1.4;
+}
+
+.error {
+  color: #9b1c1c;
+  font-size: 0.9rem;
+}
+
+/* Rings — inspired by donor NavigationViewer, light theme */
+.ringsWrap {
+  position: relative;
+  width: min(100%, 460px);
+  aspect-ratio: 1;
+  margin: 0.5rem auto 0.75rem;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.ringO {
+  width: 34%;
+  height: 34%;
+  border-color: #d97706;
+  background: rgba(255, 255, 255, 0.92);
+  flex-direction: column;
+  z-index: 2;
+  text-align: center;
+  padding: 0.4rem;
+}
+
+.ringOLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b45309;
+  letter-spacing: 0.06em;
+}
+
+.ringOName {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: #243b53;
+  line-height: 1.25;
+  margin-top: 0.2rem;
+}
+
+.ringL {
+  width: 92%;
+  height: 92%;
+  border-color: rgba(61, 122, 106, 0.55);
+  border-style: dashed;
+  background: rgba(61, 122, 106, 0.04);
+  z-index: 1;
+}
+
+.ringLLabel {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #3d7a6a;
+  background: #f7faf9;
+  padding: 0 0.35rem;
+}
+
+.node {
+  position: absolute;
+  width: 72px;
+  padding: 0.25rem 0.3rem;
+  border-radius: 6px;
+  border: 1px solid #9fb3c8;
+  background: #fff;
+  color: #334e68;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.node:hover {
+  border-color: #3d7a6a;
+}
+
+.nodeSelected {
+  border-color: #0b6faf;
+  background: #e6f2fa;
+  box-shadow: 0 0 0 2px rgba(11, 111, 175, 0.25);
+}
+
+.nodeHighlight {
+  border-color: #d97706;
+  background: #fff7ed;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.35);
+  font-weight: 650;
+}
+
+.nodeCard {
+  margin-top: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.nodeCard strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #243b53;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.hintInline {
+  font-size: 0.85rem;
+  color: #486581;
+}
+
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.metric {
+  flex: 1;
+  min-width: 4.5rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #d9e2ec;
+  text-align: center;
+}
+
+.metricLabel {
+  display: block;
+  font-size: 0.7rem;
+  color: #627d98;
+  font-weight: 650;
+}
+
+.metricValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #243b53;
+}
+
+.metricU {
+  border-color: #d97706;
+  background: #fffbeb;
+}
+
+.trList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trItem {
+  text-align: left;
+  width: 100%;
+  border: 1px solid #d9e2ec;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.trItem:hover {
+  border-color: #3d7a6a;
+}
+
+.trActive {
+  border-color: #d97706;
+  background: #fff7ed;
+  box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.3);
+}
+
+.trMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  color: #627d98;
+}
+
+.trText {
+  font-size: 0.86rem;
+  font-weight: 650;
+  color: #243b53;
+  line-height: 1.3;
+}
+
+.trArrow {
+  font-size: 0.78rem;
+  color: #486581;
+  margin-top: 0.2rem;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.tab {
+  border: 1px solid #bcccdc;
+  background: #fff;
+  color: #486581;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tabActive {
+  background: #3d7a6a;
+  border-color: #3d7a6a;
+  color: #fff;
+  font-weight: 600;
+}
+
+.docPanel {
+  background: #f7faf9;
+  border: 1px solid #d9e2ec;
+  border-radius: 10px;
+  padding: 1rem 1.15rem 1.5rem;
+  max-width: 52rem;
+}
+
+.helpH {
+  margin: 1.1rem 0 0.4rem;
+  font-size: 1rem;
+  color: #243b53;
+}
+
+.helpP {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #334e68;
+}
+
+.helpList {
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #334e68;
+}
+
+.helpList li {
+  margin-bottom: 0.35rem;
+}
+
+.markdown {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #243b53;
+}
+
+.markdown :global(h1),
+.markdown :global(h2),
+.markdown :global(h3) {
+  color: #243b53;
+  margin: 1rem 0 0.4rem;
+}
+
+.markdown :global(p),
+.markdown :global(li) {
+  color: #334e68;
+}
+
+.markdown :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.75rem 0;
+  font-size: 0.82rem;
+}
+
+.markdown :global(th),
+.markdown :global(td) {
+  border: 1px solid #d9e2ec;
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+
+.markdown :global(code) {
+  font-size: 0.82em;
+  background: #eef2f6;
+  padding: 0.05rem 0.25rem;
+  border-radius: 3px;
+}

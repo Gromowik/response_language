@@ -29,3 +29,6 @@ public/4/
 public/5/
 public/6/
 public/7/
+
+# Local RL-donor reference (not shipped; borrow structures only)
+public/donor_program/
