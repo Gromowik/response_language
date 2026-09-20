@@ -26,6 +26,7 @@ React + Vite приложение для визуализации и управ�
 18. **Visual Model** - пилот визуальной модели на сиде рычаг (папки, центры, подъём груза)
 19. **Ring Demo** - O + внешнее кольцо R_O + трансляции на рычаге (`public/work/lever_ring_demo.json`; вход из Visual Model)
 20. **HF Centers** - центры высокой частоты / выпрямления (`public/work/hf_centers.json`; частота и личное касание в localStorage)
+21. **RL Trial** - пробный процесс на рычаге: два объекта (данность/работа), обмен, лента сессии + ваши ленты A/B (`public/work/lever_rl_trial_objects.json`); теория — вкладка / [`what_could_be_new.md`](./public/work/what_could_be_new.md)
 
 ### Подготовка объекта к RL (новые слои)
 

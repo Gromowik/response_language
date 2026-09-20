@@ -226,9 +226,9 @@ export default function VisualModel({ onNavigate }) {
               <button
                 type="button"
                 className={styles.topLink}
-                onClick={() => onNavigate('cloudModels')}
+                onClick={() => onNavigate('rlTrial')}
               >
-                → Cloud Models
+                → RL Trial (два объекта)
               </button>
             </>
           ) : null}

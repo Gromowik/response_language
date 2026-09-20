@@ -19,6 +19,7 @@ import Repeater from './components/Repeater'
 import VisualModel from './components/VisualModel'
 import RingDemo from './components/RingDemo'
 import HfCenters from './components/HfCenters'
+import RlTrial from './components/RlTrial'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
@@ -431,6 +432,12 @@ function App() {
           >
             HF Centers
           </button>
+          <button
+            onClick={() => goToPage('rlTrial')}
+            className={`btn ${currentPage === 'rlTrial' ? 'btn-primary' : 'btn-secondary'}`}
+          >
+            RL Trial
+          </button>
           <button 
             onClick={() => {
               setIsCreating(currentPage)
@@ -449,7 +456,8 @@ function App() {
               currentPage === 'repeater' ||
               currentPage === 'visualModel' ||
               currentPage === 'ringDemo' ||
-              currentPage === 'hfCenters'
+              currentPage === 'hfCenters' ||
+              currentPage === 'rlTrial'
             }
           >
             + New Card
@@ -577,6 +585,8 @@ function App() {
           <RingDemo onNavigate={goToPage} />
         ) : currentPage === 'hfCenters' ? (
           <HfCenters onNavigate={goToPage} />
+        ) : currentPage === 'rlTrial' ? (
+          <RlTrial onNavigate={goToPage} />
         ) : (
           <CircularTape
             cards={circularDisplayCards.length > 0 ? circularDisplayCards : cards}
