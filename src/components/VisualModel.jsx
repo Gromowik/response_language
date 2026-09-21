@@ -122,7 +122,7 @@ function findFolder(nodes, id) {
   return null
 }
 
-export default function VisualModel({ onNavigate }) {
+export default function VisualModel({ onNavigate, workImprint = false }) {
   const [tab, setTab] = useState('pilot') // pilot | thoughts
   const [raised, setRaised] = useState(false)
   const [animating, setAnimating] = useState(false)
@@ -197,15 +197,27 @@ export default function VisualModel({ onNavigate }) {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <p className={styles.kicker}>Visual model · пилот</p>
+        <p className={styles.kicker}>
+          {workImprint
+            ? 'Рабочий отпечаток · Visual Model (копия)'
+            : 'Visual model · пилот · витрина сида'}
+        </p>
         <h1 className={styles.title}>Визуальная модель — рычаг</h1>
         <p className={styles.lead}>
-          Пробная страница на первом сиде: статика (папки), динамика (центры), данные +
-          симуляция подъёма груза. Трансляции как центры понимания — пока только помечены.
+          {workImprint
+            ? 'Рабочий случай 1: тот же образ — статика (папки), динамика (центры), данные + подъём груза. Дальше сюда будем переносить возможности с витрины по одной.'
+            : 'Пробная страница на первом сиде: статика (папки), динамика (центры), данные + симуляция подъёма груза. Трансляции как центры понимания — пока только помечены.'}
         </p>
         <nav className={styles.topLinks}>
-          {onNavigate ? (
+          {onNavigate && !workImprint ? (
             <>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('workImprint')}
+              >
+                → Рабочий отпечаток (случай 1)
+              </button>
               <button
                 type="button"
                 className={styles.topLink}
@@ -222,6 +234,13 @@ export default function VisualModel({ onNavigate }) {
                 onClick={() => onNavigate('reflection')}
               >
                 → Reflection (трансляции)
+              </button>
+              <button
+                type="button"
+                className={styles.topLink}
+                onClick={() => onNavigate('cloudModels')}
+              >
+                → Cloud Models
               </button>
               <button
                 type="button"

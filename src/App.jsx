@@ -20,14 +20,21 @@ import VisualModel from './components/VisualModel'
 import RingDemo from './components/RingDemo'
 import HfCenters from './components/HfCenters'
 import RlTrial from './components/RlTrial'
+import WorkImprint from './components/WorkImprint'
+import WorkRingDemo from './components/WorkRingDemo'
+import WorkTodoViewer from './components/WorkTodoViewer'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
+import { loadWorkPerson1Cards, saveWorkPerson1Cards } from './utils/workAttentionStorage'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('horizontal') // ..., 'readme', 'quickRecall', or 'exchangeField'
   const [cards, setCards] = useState([])
   const [cardsPerson2, setCardsPerson2] = useState([]) // Cards for Person 2
+  const [workCardsPerson1, setWorkCardsPerson1] = useState(() =>
+    ensurePersonIds(loadWorkPerson1Cards(), 1)
+  ) // Рабочий отпечаток · Person 1 (не Сид)
   const [verticalCards, setVerticalCards] = useState([])
   const [leftVerticalCards, setLeftVerticalCards] = useState([])
   const [circularCards, setCircularCards] = useState([])
@@ -36,10 +43,25 @@ function App() {
   const [editingCard, setEditingCard] = useState(null)
   const [isCreating, setIsCreating] = useState(null) // null, 'horizontal', 'horizontal2', 'vertical', 'leftVertical', 'circular', or 'philosophy'
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [seedReturnPage, setSeedReturnPage] = useState('horizontal')
+
+  const WORK_PAGES = ['workImprint', 'workRingDemo', 'workPerson1', 'workTodo']
+  const inWorkEnv = WORK_PAGES.includes(currentPage)
 
   const goToPage = (page) => {
+    if (WORK_PAGES.includes(page) && !WORK_PAGES.includes(currentPage)) {
+      setSeedReturnPage(currentPage)
+    }
     setCurrentPage(page)
     setMobileNavOpen(false)
+  }
+
+  const enterWorkEnv = () => {
+    goToPage('workImprint')
+  }
+
+  const leaveWorkEnv = () => {
+    goToPage(seedReturnPage || 'horizontal')
   }
 
   // Load cards on mount
@@ -104,6 +126,11 @@ function App() {
       saveCardsPerson2(cardsPerson2)
     }
   }, [cardsPerson2])
+
+  // Рабочий Person 1 — можно и пустой массив (после очистки)
+  useEffect(() => {
+    saveWorkPerson1Cards(workCardsPerson1)
+  }, [workCardsPerson1])
 
   // Save vertical cards to localStorage
   useEffect(() => {
@@ -187,6 +214,10 @@ function App() {
         setCardsPerson2(updatedCardsPerson2);
         // Sync description and name with external reflection if needed
         syncCardWithReflection(updatedCard, formData, updatedCardsPerson2, cards, setCardsPerson2, setCards);
+      } else if (isCreating === 'workPerson1') {
+        setWorkCardsPerson1(
+          workCardsPerson1.map((c) => (c.id === editingCard.id ? updatedCard : c))
+        )
       } else {
         const updatedCards = cards.map(c => c.id === editingCard.id ? updatedCard : c);
         setCards(updatedCards);
@@ -232,6 +263,8 @@ function App() {
         } else {
           setCardsPerson2([...cardsPerson2, newCard]);
         }
+      } else if (isCreating === 'workPerson1') {
+        setWorkCardsPerson1([...workCardsPerson1, newCard])
       } else {
         // Create external reflection if this is generated or internal reflection
         if (newCard.type === 'generated' || newCard.type === 'internalReflection') {
@@ -297,7 +330,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="app-header-top">
-          <h1>Object Tape Calculator</h1>
+          <h1>{inWorkEnv ? 'Рабочий отпечаток' : 'Object Tape Calculator'}</h1>
           <button
             type="button"
             className="btn btn-primary mobile-nav-toggle"
@@ -312,6 +345,54 @@ function App() {
           id="app-nav"
           className={`app-controls ${mobileNavOpen ? 'app-controls-open' : ''}`}
         >
+          {inWorkEnv ? (
+            <>
+              <button
+                type="button"
+                onClick={() => goToPage('workImprint')}
+                className={`btn ${currentPage === 'workImprint' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Visual Model
+              </button>
+              <button
+                type="button"
+                onClick={() => goToPage('workRingDemo')}
+                className={`btn ${currentPage === 'workRingDemo' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Ring Demo
+              </button>
+              <button
+                type="button"
+                onClick={() => goToPage('workPerson1')}
+                className={`btn ${currentPage === 'workPerson1' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Person 1 Tape
+              </button>
+              <button
+                type="button"
+                onClick={() => goToPage('workTodo')}
+                className={`btn ${currentPage === 'workTodo' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                TODO
+              </button>
+              {currentPage === 'workPerson1' ? (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setIsCreating('workPerson1')
+                    setMobileNavOpen(false)
+                  }}
+                >
+                  + New Card
+                </button>
+              ) : null}
+              <button type="button" onClick={leaveWorkEnv} className="btn btn-secondary">
+                ← К лицевому Сиду
+              </button>
+            </>
+          ) : (
+            <>
           <button 
             onClick={() => goToPage('horizontal')}
             className={`btn ${currentPage === 'horizontal' ? 'btn-primary' : 'btn-secondary'}`}
@@ -421,6 +502,12 @@ function App() {
             Visual Model
           </button>
           <button
+            onClick={enterWorkEnv}
+            className="btn btn-work"
+          >
+            Рабочий отпечаток
+          </button>
+          <button
             onClick={() => goToPage('ringDemo')}
             className={`btn ${currentPage === 'ringDemo' ? 'btn-primary' : 'btn-secondary'}`}
           >
@@ -455,6 +542,8 @@ function App() {
               currentPage === 'cloudModels' ||
               currentPage === 'repeater' ||
               currentPage === 'visualModel' ||
+              currentPage === 'workImprint' ||
+              currentPage === 'workRingDemo' ||
               currentPage === 'ringDemo' ||
               currentPage === 'hfCenters' ||
               currentPage === 'rlTrial'
@@ -474,6 +563,8 @@ function App() {
               style={{ display: 'none' }}
             />
           </label>
+            </>
+          )}
         </div>
       </header>
 
@@ -581,6 +672,30 @@ function App() {
           <Repeater />
         ) : currentPage === 'visualModel' ? (
           <VisualModel onNavigate={goToPage} />
+        ) : currentPage === 'workImprint' ? (
+          <WorkImprint onNavigate={goToPage} />
+        ) : currentPage === 'workRingDemo' ? (
+          <WorkRingDemo
+            onPushToWorkPerson1={(nextCards) => {
+              setWorkCardsPerson1(ensurePersonIds(nextCards, 1))
+              goToPage('workPerson1')
+            }}
+          />
+        ) : currentPage === 'workPerson1' ? (
+          <ObjectTape
+            cards={workCardsPerson1}
+            onCardSelect={(card) => {
+              setEditingCard(card)
+              setIsCreating('workPerson1')
+            }}
+            onCardEdit={(card) => {
+              setEditingCard(card)
+              setIsCreating('workPerson1')
+            }}
+            onCardsReorder={(reorderedCards) => setWorkCardsPerson1(reorderedCards)}
+          />
+        ) : currentPage === 'workTodo' ? (
+          <WorkTodoViewer />
         ) : currentPage === 'ringDemo' ? (
           <RingDemo onNavigate={goToPage} />
         ) : currentPage === 'hfCenters' ? (

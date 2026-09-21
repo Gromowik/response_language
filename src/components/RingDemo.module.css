@@ -202,10 +202,11 @@
 }
 
 .nodeHighlight {
-  border-color: #d97706;
-  background: #fff7ed;
-  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.35);
-  font-weight: 650;
+  border-color: #d97706 !important;
+  background: #fff7ed !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.45);
+  font-weight: 700;
+  z-index: 5;
 }
 
 .nodeCard {

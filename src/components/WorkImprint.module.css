@@ -1,0 +1,39 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(90deg, #e8f5e9 0%, #f1f8f4 55%, #f7faf9 100%);
+  border-bottom: 2px solid #66bb6a;
+  color: #1b5e20;
+  font-size: 0.9rem;
+}
+
+.bannerHint {
+  flex: 1 1 14rem;
+  font-size: 0.82rem;
+  color: #2e7d32;
+  line-height: 1.35;
+}
+
+.bannerLink {
+  border: 1px solid #81c784;
+  background: #fff;
+  color: #2e7d32;
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.bannerLink:hover {
+  background: #e8f5e9;
+  border-color: #43a047;
+}

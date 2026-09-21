@@ -84,6 +84,26 @@ body {
   background-color: #7f8c8d;
 }
 
+/* Рабочий отпечаток — отделяем от витрины сида */
+.btn-work {
+  background-color: #66bb6a;
+  color: white;
+}
+
+.btn-work:hover {
+  background-color: #43a047;
+}
+
+.btn-work-active {
+  background-color: #2e7d32;
+  color: white;
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.35);
+}
+
+.btn-work-active:hover {
+  background-color: #1b5e20;
+}
+
 .app-main {
   flex: 1;
   padding: 0;

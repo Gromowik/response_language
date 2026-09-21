@@ -1,0 +1,399 @@
+{
+  "meta": {
+    "case": "work-imprint-1-lever",
+    "note": "Модель 1 = вход (физика/наблюдения, вычислительные центры ближе к O). Модель 2 = выход (отпечаток через трансляции по важности)."
+  },
+  "objects": [
+    {
+      "M": {
+        "id": "work-lever-in",
+        "O": {
+          "name": "Рычаг · вход",
+          "description": "Общий понятный старт: физика и наблюдения. Модель на постоянной работе (важна высота груза / A, не время). Центры: работа → мощность → ω — ближе к O по важности."
+        },
+        "type": ["phenomenal", "host", "work-imprint", "input"],
+        "inclusions": { "tags": ["lever", "вход", "физика"] }
+      },
+      "role": "input",
+      "L": [
+        {
+          "params": {
+            "leverR_m": 1.5,
+            "leverR_range": [1.2, 1.8],
+            "wrapR_m": 1.0,
+            "handSpeed_kmh": 5,
+            "liftHeight_m": 2.0,
+            "loadMass_kg": 50,
+            "g": 9.81
+          }
+        },
+        {
+          "R_O": [
+            {
+              "M": {
+                "id": "mechanism",
+                "O": {
+                  "tastes": "Механизм",
+                  "description": "Корень ВО — всё изделие в покое.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO", "folder"]
+              }
+            },
+            {
+              "M": {
+                "id": "me",
+                "O": {
+                  "tastes": "Я (силы)",
+                  "description": "Приложение сил на рычаге — наблюдение источника.",
+                  "magnitude": "v_касат. ≈ 5 км/ч"
+                },
+                "type": ["R_O", "VO", "folder"]
+              }
+            },
+            {
+              "M": {
+                "id": "wheel-common",
+                "O": {
+                  "tastes": "Общее колесо",
+                  "description": "Связь входа и выхода в пространстве механизма.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO", "folder"]
+              }
+            },
+            {
+              "M": {
+                "id": "lever",
+                "O": {
+                  "tastes": "Рычаг",
+                  "description": "Радиус вращения руки.",
+                  "magnitude": "R ≈ 1.5 м (1.2–1.8)"
+                },
+                "type": ["R_O", "VO", "folder"]
+              }
+            },
+            {
+              "M": {
+                "id": "wrap",
+                "O": {
+                  "tastes": "Намотка",
+                  "description": "Точка намотки — цепь всегда видна с правого края барабана.",
+                  "magnitude": "r₂ = 1.0 м"
+                },
+                "type": ["R_O", "VO", "folder"]
+              }
+            },
+            {
+              "M": {
+                "id": "load",
+                "O": {
+                  "tastes": "Груз",
+                  "description": "Реальный узел ВО; величины притягиваются к нему.",
+                  "magnitude": "m ≈ 50 кг; h = 2 м"
+                },
+                "type": ["R_O", "VO", "folder"]
+              }
+            }
+          ]
+        },
+        {
+          "centersChange": [
+            {
+              "M": {
+                "id": "center-load-path",
+                "O": {
+                  "name": "Путь груза вверх / вниз",
+                  "description": "Центр изменения облика: две яркие точки — внизу и поднято.",
+                  "states": ["down", "raised"]
+                },
+                "highlights": [{ "id": "load" }],
+                "type": ["center", "change"]
+              }
+            }
+          ]
+        },
+        {
+          "centersUnderstand": [
+            {
+              "M": {
+                "id": "center-work",
+                "O": {
+                  "name": "Работа A",
+                  "description": "Накопительный итог. Для груза ≈ m·g·h; для «я» ≈ F·Δl по пути руки. Часто важнее мощность — что работа сделана. Модель основана на постоянной работе: рычаг можно менять, важна итоговая работа по подъёму груза, а не время выполнения — груз на заданную высоту поднимается медленнее, но вращать проще: то же расстояние движения по касательной за то же время на большем рычаге.",
+                  "formula": "A_груз ≈ m·g·h; A_я ≈ F·Δl_руки"
+                },
+                "importance": 1.0,
+                "highlights": [{ "id": "me" }, { "id": "load" }],
+                "type": ["center", "understand"]
+              }
+            },
+            {
+              "M": {
+                "id": "center-power",
+                "O": {
+                  "name": "Мощность P",
+                  "description": "Мгновенное / в единицу времени: P = A/Δt. Передача от рычага к перемещению груза. Мощность передаётся та же: что даём на входе — то получаем на выходе; при увеличении рычага мощность падает, потому что та же работа делается за большее время.",
+                  "formula": "P = A / Δt"
+                },
+                "importance": 0.85,
+                "highlights": [{ "id": "me" }, { "id": "load" }],
+                "type": ["center", "understand"]
+              }
+            },
+            {
+              "M": {
+                "id": "center-omega",
+                "O": {
+                  "name": "Угловая скорость ω",
+                  "description": "Пропорция: 2πr ↔ 360°. Δφ = Δl·360/(2πr); ω = Δφ/Δt. Угловая скорость колеса единая — одно колесо; путь груза в единицу времени привязан к вращению намотки постоянного радиуса (скорость намотки цепи). Мощность зависит от ω. Если удлиняем рычаг при постоянной касательной скорости руки — ω падает, замечаем скачок / падение мощности.",
+                  "formula": "Δφ = Δl·360/(2πr); ω = Δφ/Δt"
+                },
+                "importance": 0.7,
+                "highlights": [{ "id": "wheel-common" }, { "id": "wrap" }],
+                "type": ["center", "understand"]
+              }
+            }
+          ]
+        },
+        {
+          "translations": []
+        }
+      ]
+    },
+    {
+      "M": {
+        "id": "work-lever-out",
+        "O": {
+          "name": "Рычаг · выход",
+          "description": "Отпечаток через трансляции: что сейчас важно вам и как лучше видите сами. Проход по трансляциям по важности (полный перечень)."
+        },
+        "type": ["phenomenal", "host", "work-imprint", "output"],
+        "inclusions": { "tags": ["lever", "выход", "трансляции"] }
+      },
+      "role": "output",
+      "L": [
+        {
+          "params": {
+            "leverR_m": 1.5,
+            "wrapR_m": 1.0,
+            "liftHeight_m": 2.0,
+            "loadMass_kg": 50,
+            "g": 9.81
+          }
+        },
+        {
+          "R_O": [
+            {
+              "M": {
+                "id": "me",
+                "O": {
+                  "tastes": "Я (силы)",
+                  "description": "Источник — то, что меня касается.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO"]
+              }
+            },
+            {
+              "M": {
+                "id": "lever",
+                "O": {
+                  "tastes": "Рычаг",
+                  "description": "Геометрия ощущения / передачи.",
+                  "magnitude": "R меняется"
+                },
+                "type": ["R_O", "VO"]
+              }
+            },
+            {
+              "M": {
+                "id": "wheel-common",
+                "O": {
+                  "tastes": "Общее колесо",
+                  "description": "Связь мощности входа и выхода.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO"]
+              }
+            },
+            {
+              "M": {
+                "id": "wrap",
+                "O": {
+                  "tastes": "Намотка",
+                  "description": "К скорости подъёма груза.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO"]
+              }
+            },
+            {
+              "M": {
+                "id": "load",
+                "O": {
+                  "tastes": "Груз",
+                  "description": "Результат — для чего делаю.",
+                  "magnitude": "итог перемещения"
+                },
+                "type": ["R_O", "VO"]
+              }
+            },
+            {
+              "M": {
+                "id": "work",
+                "O": {
+                  "tastes": "Работа",
+                  "description": "То, что транслируется: сделанная работа (константа / суть).",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO", "translated"]
+              }
+            },
+            {
+              "M": {
+                "id": "power",
+                "O": {
+                  "tastes": "Мощность",
+                  "description": "То, что транслируется: мощность передачи / ощущение на рычаге.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO", "translated"]
+              }
+            },
+            {
+              "M": {
+                "id": "lift-speed",
+                "O": {
+                  "tastes": "Скорость подъёма",
+                  "description": "То, что транслируется: скорость подъёма груза.",
+                  "magnitude": null
+                },
+                "type": ["R_O", "VO", "translated"]
+              }
+            }
+          ]
+        },
+        {
+          "centersChange": [
+            {
+              "M": {
+                "id": "center-load-path",
+                "O": {
+                  "name": "Путь груза",
+                  "description": "Состояние внизу / поднято — для резонанса с трансляциями.",
+                  "states": ["down", "raised"]
+                },
+                "highlights": [{ "id": "load" }],
+                "type": ["center", "change"]
+              }
+            }
+          ]
+        },
+        {
+          "centersUnderstand": []
+        },
+        {
+          "translations": [
+            {
+              "M": {
+                "id": "tr-me-work",
+                "O": {
+                  "from": "Я (приложение сил)",
+                  "to": "Сделанная работа",
+                  "text": "Я → сделанная работа (константа / суть)",
+                  "note": "та же сделанная работа, просто медленней"
+                },
+                "order": 1,
+                "importance": 0.8,
+                "kind": "constant",
+                "targets": [{ "id": "me" }, { "id": "work" }, { "id": "load" }],
+                "type": ["translation", "beacon"]
+              }
+            },
+            {
+              "M": {
+                "id": "tr-me-power-tx",
+                "O": {
+                  "from": "Я (приложение сил)",
+                  "to": "Мощность передачи",
+                  "text": "Я → мощность передачи (перемена)",
+                  "note": "мощность меньше при увеличении рычага"
+                },
+                "order": 2,
+                "importance": 0.6,
+                "kind": "change",
+                "targets": [{ "id": "me" }, { "id": "power" }, { "id": "lever" }],
+                "type": ["translation", "beacon"]
+              }
+            },
+            {
+              "M": {
+                "id": "tr-me-power-feel",
+                "O": {
+                  "from": "Я (приложение сил)",
+                  "to": "Мощность на рычаге (ощущение)",
+                  "text": "Я → мощность на рычаге, ощущение (перемена)",
+                  "note": "рычаг стало двигать легче с той же скоростью"
+                },
+                "order": 3,
+                "importance": 1.0,
+                "kind": "change",
+                "targets": [{ "id": "me" }, { "id": "lever" }, { "id": "power" }],
+                "type": ["translation", "beacon"]
+              }
+            },
+            {
+              "M": {
+                "id": "tr-load-speed",
+                "O": {
+                  "from": "Груз",
+                  "to": "Скорость подъёма груза",
+                  "text": "Груз → скорость подъёма (перемена)",
+                  "note": "движется медленней при повышении радиуса рычага"
+                },
+                "order": 4,
+                "importance": 0.7,
+                "kind": "change",
+                "targets": [{ "id": "load" }, { "id": "lift-speed" }, { "id": "wrap" }],
+                "type": ["translation", "beacon"]
+              }
+            },
+            {
+              "M": {
+                "id": "tr-load-work",
+                "O": {
+                  "from": "Груз",
+                  "to": "Сделанная работа",
+                  "text": "Груз → сделанная работа (константа / суть)",
+                  "note": "работа та же, но сделанная медленней"
+                },
+                "order": 5,
+                "importance": 1.0,
+                "kind": "constant",
+                "targets": [{ "id": "load" }, { "id": "work" }],
+                "type": ["translation", "beacon"]
+              }
+            },
+            {
+              "M": {
+                "id": "tr-load-power",
+                "O": {
+                  "from": "Груз",
+                  "to": "Мощность передачи",
+                  "text": "Груз → мощность передачи (перемена)",
+                  "note": "мощность передаваемая меньше при увеличении рычага"
+                },
+                "order": 6,
+                "importance": 1.0,
+                "kind": "change",
+                "targets": [{ "id": "load" }, { "id": "power" }, { "id": "wheel-common" }],
+                "type": ["translation", "beacon"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
