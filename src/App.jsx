@@ -23,10 +23,30 @@ import RlTrial from './components/RlTrial'
 import WorkImprint from './components/WorkImprint'
 import WorkRingDemo from './components/WorkRingDemo'
 import WorkTodoViewer from './components/WorkTodoViewer'
+import WorkDualTape from './components/WorkDualTape'
+import WorkVerticalShell from './components/WorkVerticalShell'
 import CardEditor from './components/CardEditor'
 import { loadCards, saveCards, loadCardsPerson2, saveCardsPerson2, exportCardsToFile, importCardsFromFile, createCard, createVerticalTapeCards, createLeftVerticalTapeCards, createCircularTapeCards } from './utils/cardStorage'
 import { createExternalReflection, findExternalReflection, syncCardWithReflection, removeCardWithReflection, ensurePersonIds } from './utils/reflectionSync'
-import { loadWorkPerson1Cards, saveWorkPerson1Cards } from './utils/workAttentionStorage'
+import {
+  loadWorkPerson1Cards,
+  saveWorkPerson1Cards,
+  loadWorkPerson2Cards,
+  saveWorkPerson2Cards,
+  ensureWorkPerson2Cards,
+  loadWorkContactP1,
+  saveWorkContactP1,
+  loadWorkContactP2,
+  saveWorkContactP2,
+  appendContactCard,
+  removeContactCard,
+  prepareWorkVerticalFromContacts,
+  loadWorkVerticalP1,
+  saveWorkVerticalP1,
+  loadWorkVerticalP2,
+  saveWorkVerticalP2,
+  normalizeCardsColorsByType,
+} from './utils/workAttentionStorage'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('horizontal') // ..., 'readme', 'quickRecall', or 'exchangeField'
@@ -35,6 +55,13 @@ function App() {
   const [workCardsPerson1, setWorkCardsPerson1] = useState(() =>
     ensurePersonIds(loadWorkPerson1Cards(), 1)
   ) // Рабочий отпечаток · Person 1 (не Сид)
+  const [workCardsPerson2, setWorkCardsPerson2] = useState(() =>
+    ensurePersonIds(loadWorkPerson2Cards(), 2)
+  ) // Рабочий отпечаток · Person 2 · Cursor
+  const [workContactP1, setWorkContactP1] = useState(() => loadWorkContactP1())
+  const [workContactP2, setWorkContactP2] = useState(() => loadWorkContactP2())
+  const [workVertP1, setWorkVertP1] = useState(() => loadWorkVerticalP1())
+  const [workVertP2, setWorkVertP2] = useState(() => loadWorkVerticalP2())
   const [verticalCards, setVerticalCards] = useState([])
   const [leftVerticalCards, setLeftVerticalCards] = useState([])
   const [circularCards, setCircularCards] = useState([])
@@ -45,7 +72,16 @@ function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [seedReturnPage, setSeedReturnPage] = useState('horizontal')
 
-  const WORK_PAGES = ['workImprint', 'workRingDemo', 'workPerson1', 'workTodo']
+  const WORK_PAGES = [
+    'workImprint',
+    'workRingDemo',
+    'workPerson1',
+    'workPerson2',
+    'workVertical1',
+    'workVertical2',
+    'workBothVertical',
+    'workTodo',
+  ]
   const inWorkEnv = WORK_PAGES.includes(currentPage)
 
   const goToPage = (page) => {
@@ -131,6 +167,69 @@ function App() {
   useEffect(() => {
     saveWorkPerson1Cards(workCardsPerson1)
   }, [workCardsPerson1])
+
+  useEffect(() => {
+    saveWorkPerson2Cards(workCardsPerson2)
+  }, [workCardsPerson2])
+
+  useEffect(() => {
+    saveWorkContactP1(workContactP1)
+  }, [workContactP1])
+
+  useEffect(() => {
+    saveWorkContactP2(workContactP2)
+  }, [workContactP2])
+
+  useEffect(() => {
+    saveWorkVerticalP1(workVertP1)
+  }, [workVertP1])
+
+  useEffect(() => {
+    saveWorkVerticalP2(workVertP2)
+  }, [workVertP2])
+
+  const rebuildWorkVertical = (leader = 1) => {
+    const { p1, p2 } = prepareWorkVerticalFromContacts(workContactP1, workContactP2, {
+      leader,
+    })
+    setWorkVertP1(ensurePersonIds(p1, 1))
+    setWorkVertP2(ensurePersonIds(p2, 2))
+    return { p1, p2 }
+  }
+
+  const openWorkVertical = (side) => {
+    if (!workContactP1.length && !workContactP2.length) {
+      alert('Сначала наполните ленты соприкосновения у Person 1 и/или Person 2.')
+      return
+    }
+    rebuildWorkVertical(1)
+    goToPage(side === 2 ? 'workVertical2' : 'workVertical1')
+  }
+
+  const openWorkBothVertical = () => {
+    if (!workContactP1.length && !workContactP2.length) {
+      alert('Сначала наполните ленты соприкосновения у Person 1 и/или Person 2.')
+      return
+    }
+    rebuildWorkVertical(1)
+    goToPage('workBothVertical')
+  }
+
+  // Person 2 Tape: при открытии сразу сид Cursor (актуальный JSON)
+  useEffect(() => {
+    if (currentPage !== 'workPerson2') return undefined
+    let cancelled = false
+    ensureWorkPerson2Cards(true)
+      .then((cards) => {
+        if (!cancelled && cards.length) {
+          setWorkCardsPerson2(ensurePersonIds(cards, 2))
+        }
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [currentPage])
 
   // Save vertical cards to localStorage
   useEffect(() => {
@@ -218,6 +317,22 @@ function App() {
         setWorkCardsPerson1(
           workCardsPerson1.map((c) => (c.id === editingCard.id ? updatedCard : c))
         )
+      } else if (isCreating === 'workPerson2') {
+        setWorkCardsPerson2(
+          workCardsPerson2.map((c) => (c.id === editingCard.id ? updatedCard : c))
+        )
+      } else if (isCreating === 'workContactP1') {
+        setWorkContactP1(
+          workContactP1.map((c) => (c.id === editingCard.id ? updatedCard : c))
+        )
+      } else if (isCreating === 'workContactP2') {
+        setWorkContactP2(
+          workContactP2.map((c) => (c.id === editingCard.id ? updatedCard : c))
+        )
+      } else if (isCreating === 'workVertP1') {
+        setWorkVertP1(workVertP1.map((c) => (c.id === editingCard.id ? updatedCard : c)))
+      } else if (isCreating === 'workVertP2') {
+        setWorkVertP2(workVertP2.map((c) => (c.id === editingCard.id ? updatedCard : c)))
       } else {
         const updatedCards = cards.map(c => c.id === editingCard.id ? updatedCard : c);
         setCards(updatedCards);
@@ -265,6 +380,8 @@ function App() {
         }
       } else if (isCreating === 'workPerson1') {
         setWorkCardsPerson1([...workCardsPerson1, newCard])
+      } else if (isCreating === 'workPerson2') {
+        setWorkCardsPerson2([...workCardsPerson2, { ...newCard, personId: 2 }])
       } else {
         // Create external reflection if this is generated or internal reflection
         if (newCard.type === 'generated' || newCard.type === 'internalReflection') {
@@ -370,22 +487,84 @@ function App() {
               </button>
               <button
                 type="button"
+                onClick={() => goToPage('workPerson2')}
+                className={`btn ${currentPage === 'workPerson2' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Person 2 Tape
+              </button>
+              <button
+                type="button"
+                onClick={() => openWorkVertical(1)}
+                className={`btn ${currentPage === 'workVertical1' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Vertical Person 1
+              </button>
+              <button
+                type="button"
+                onClick={() => openWorkVertical(2)}
+                className={`btn ${currentPage === 'workVertical2' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Vertical Person 2
+              </button>
+              <button
+                type="button"
+                onClick={openWorkBothVertical}
+                className={`btn ${currentPage === 'workBothVertical' ? 'btn-work-active' : 'btn-work'}`}
+              >
+                Both Vertical
+              </button>
+              <button
+                type="button"
                 onClick={() => goToPage('workTodo')}
                 className={`btn ${currentPage === 'workTodo' ? 'btn-work-active' : 'btn-work'}`}
               >
                 TODO
               </button>
-              {currentPage === 'workPerson1' ? (
+              {currentPage === 'workPerson1' || currentPage === 'workPerson2' ? (
                 <button
                   type="button"
                   className="btn btn-primary"
                   onClick={() => {
-                    setIsCreating('workPerson1')
+                    setIsCreating(currentPage)
                     setMobileNavOpen(false)
                   }}
                 >
                   + New Card
                 </button>
+              ) : null}
+              {currentPage === 'workPerson2' ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      if (
+                        !window.confirm(
+                          'Заново загрузить сид Cursor Person 2 из cursor_person2_tape.json? Текущие правки этой ленты будут заменены.'
+                        )
+                      ) {
+                        return
+                      }
+                      ensureWorkPerson2Cards(true)
+                        .then((cards) => setWorkCardsPerson2(ensurePersonIds(cards, 2)))
+                        .catch((err) => alert(err.message || 'Ошибка загрузки'))
+                    }}
+                  >
+                    ↺ Сид Cursor
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setWorkCardsPerson2((prev) =>
+                        ensurePersonIds(normalizeCardsColorsByType(prev), 2)
+                      )
+                    }}
+                    title="Generated→синий, External→зелёный, Internal→коричневый (README)"
+                  >
+                    Цвета по типу
+                  </button>
+                </>
               ) : null}
               <button type="button" onClick={leaveWorkEnv} className="btn btn-secondary">
                 ← К лицевому Сиду
@@ -682,18 +861,153 @@ function App() {
             }}
           />
         ) : currentPage === 'workPerson1' ? (
-          <ObjectTape
-            cards={workCardsPerson1}
-            onCardSelect={(card) => {
+          <WorkDualTape
+            personLabel="Person 1"
+            personSide={1}
+            upperCards={workCardsPerson1}
+            contactCards={workContactP1}
+            onUpperEdit={(card) => {
               setEditingCard(card)
               setIsCreating('workPerson1')
             }}
-            onCardEdit={(card) => {
+            onUpperReorder={(reordered) => setWorkCardsPerson1(reordered)}
+            onContactEdit={(card) => {
               setEditingCard(card)
-              setIsCreating('workPerson1')
+              setIsCreating('workContactP1')
             }}
-            onCardsReorder={(reorderedCards) => setWorkCardsPerson1(reorderedCards)}
+            onContactReorder={(reordered) => setWorkContactP1(reordered)}
+            onSendToContact={(card) =>
+              setWorkContactP1((prev) => appendContactCard(prev, card))
+            }
+            onRemoveFromContact={(card) =>
+              setWorkContactP1((prev) => removeContactCard(prev, card))
+            }
+            onOpenVertical={openWorkVertical}
+            onOpenBothVertical={openWorkBothVertical}
+            canOpenExchange={workContactP1.length > 0 || workContactP2.length > 0}
           />
+        ) : currentPage === 'workPerson2' ? (
+          <WorkDualTape
+            personLabel="Person 2 · Cursor"
+            personSide={2}
+            upperCards={workCardsPerson2}
+            contactCards={workContactP2}
+            onUpperEdit={(card) => {
+              setEditingCard(card)
+              setIsCreating('workPerson2')
+            }}
+            onUpperReorder={(reordered) => setWorkCardsPerson2(reordered)}
+            onContactEdit={(card) => {
+              setEditingCard(card)
+              setIsCreating('workContactP2')
+            }}
+            onContactReorder={(reordered) => setWorkContactP2(reordered)}
+            onSendToContact={(card) =>
+              setWorkContactP2((prev) => appendContactCard(prev, card))
+            }
+            onRemoveFromContact={(card) =>
+              setWorkContactP2((prev) => removeContactCard(prev, card))
+            }
+            onOpenVertical={openWorkVertical}
+            onOpenBothVertical={openWorkBothVertical}
+            canOpenExchange={workContactP1.length > 0 || workContactP2.length > 0}
+            upperHint="Сид Cursor подгружается при открытии (все Generated, синий/голубой). Нижняя лента — ваш фильтр соприкосновения, её открытие не сбрасывает."
+          />
+        ) : currentPage === 'workVertical1' ? (
+          <WorkVerticalShell
+            kicker="Рабочий отпечаток · обмен"
+            title="Vertical Person 1"
+            purpose="Вертикаль ведущего (Person 1): слева — ваш порядок из ленты соприкосновения (уже с парами); справа — тот же набор, отсортированный как во взаимодействии (IN+OUT / Focus Time). Сюда попадает не вся полная лента, а только фильтр соприкосновения."
+            how="Generated Person 1 получают у Person 2 парный External Reflection (IN↔OUT). Generated Person 2 (немного своего) — зеркало у Person 1. Internal Reflection каждый может добавить позже в ходе. Сид не меняется."
+            actions={
+              <>
+                <button type="button" onClick={() => openWorkVertical(1)}>
+                  ↺ Пересобрать из соприкосновения
+                </button>
+                <button type="button" onClick={openWorkBothVertical}>
+                  Both Vertical
+                </button>
+                <button type="button" onClick={() => goToPage('workPerson1')}>
+                  ← Person 1 Tape
+                </button>
+              </>
+            }
+          >
+            <LeftVerticalTape
+              cards={workVertP1}
+              otherCards={workVertP2}
+              onCardEdit={(card) => {
+                setEditingCard(card)
+                setIsCreating('workVertP1')
+              }}
+              onCardsReorder={(reordered) => setWorkVertP1(reordered)}
+            />
+          </WorkVerticalShell>
+        ) : currentPage === 'workVertical2' ? (
+          <WorkVerticalShell
+            kicker="Рабочий отпечаток · обмен"
+            title="Vertical Person 2"
+            purpose="Вертикаль Person 2 (Cursor): слева — порядок из ленты соприкосновения Person 2; справа — сортировка как во взаимодействии с учётом пар. Видно отражения ведущего и свои Generated, отданные в контакт."
+            how="Пары те же, что собраны из нижних лент: External Reflection ↔ Generated, метрики IN↔OUT примерные (можно править). Internal — в ходе. Пересборка — кнопка ниже или снова с Person Tape."
+            actions={
+              <>
+                <button type="button" onClick={() => openWorkVertical(2)}>
+                  ↺ Пересобрать из соприкосновения
+                </button>
+                <button type="button" onClick={openWorkBothVertical}>
+                  Both Vertical
+                </button>
+                <button type="button" onClick={() => goToPage('workPerson2')}>
+                  ← Person 2 Tape
+                </button>
+              </>
+            }
+          >
+            <VerticalTape
+              cards={workVertP2}
+              otherCards={workVertP1}
+              onCardEdit={(card) => {
+                setEditingCard(card)
+                setIsCreating('workVertP2')
+              }}
+              onCardsReorder={(reordered) => setWorkVertP2(reordered)}
+            />
+          </WorkVerticalShell>
+        ) : currentPage === 'workBothVertical' ? (
+          <WorkVerticalShell
+            kicker="Рабочий отпечаток · обмен"
+            title="Both Vertical"
+            purpose="Обе вертикали сразу: слева Person 1, справа Person 2 — то, что приготовлено в лентах соприкосновения, уже с парами Generated ↔ External Reflection. Экран совместного контакта / резонанса U."
+            how="Сортировка IN+OUT или Focus Time; линии пар как на витринном Both Vertical. Правки метрик и текста — в ходе. Полные верхние ленты Person Tape здесь не видны — только фильтр обмена."
+            actions={
+              <>
+                <button type="button" onClick={openWorkBothVertical}>
+                  ↺ Пересобрать из соприкосновения
+                </button>
+                <button type="button" onClick={() => goToPage('workPerson1')}>
+                  Person 1 Tape
+                </button>
+                <button type="button" onClick={() => goToPage('workPerson2')}>
+                  Person 2 Tape
+                </button>
+              </>
+            }
+          >
+            <BothVerticalTapes
+              leftCards={workVertP1}
+              rightCards={workVertP2}
+              onLeftCardEdit={(card) => {
+                setEditingCard(card)
+                setIsCreating('workVertP1')
+              }}
+              onRightCardEdit={(card) => {
+                setEditingCard(card)
+                setIsCreating('workVertP2')
+              }}
+              onLeftCardsReorder={(reordered) => setWorkVertP1(reordered)}
+              onRightCardsReorder={(reordered) => setWorkVertP2(reordered)}
+            />
+          </WorkVerticalShell>
         ) : currentPage === 'workTodo' ? (
           <WorkTodoViewer />
         ) : currentPage === 'ringDemo' ? (
@@ -771,37 +1085,39 @@ function App() {
         />
       )}
 
-      <footer className="app-footer">
-        <p className="app-footer-note">
-          Мобильная версия в разработке. На телефоне интерфейс пока упрощённый; удобнее смотреть с компьютера.
-        </p>
-        <p>Автор: Serge Gromowik · © 2026 · All Rights Reserved</p>
-        <p>
-          Некоммерческое использование — бесплатно (личное / учебное). Коммерческое — по согласованию.
-          Подробнее: <code>LICENSE</code>, <code>TERMS.md</code>.
-        </p>
-        <p>
-          По вопросам коммерческого использования, приобретения лицензии или заказной доработки
-          обращайтесь:{' '}
-          <a href="mailto:serge.gromowik@gmail.com?subject=Commercial%20license%20%2F%20Object%20Tape%20%2F%20Response%20Language">
-            serge.gromowik@gmail.com
-          </a>
-        </p>
-        <p>
-          Участие в проекте (идеи, тесты):{' '}
-          <a href="mailto:serge.gromowik@gmail.com">serge.gromowik@gmail.com</a>
-        </p>
-        <p>
-          Связанный проект:{' '}
-          <a
-            href="https://models-for-psychology.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            models-for-psychology.vercel.app
-          </a>
-        </p>
-      </footer>
+      {!inWorkEnv ? (
+        <footer className="app-footer">
+          <p className="app-footer-note">
+            Мобильная версия в разработке. На телефоне интерфейс пока упрощённый; удобнее смотреть с компьютера.
+          </p>
+          <p>Автор: Serge Gromowik · © 2026 · All Rights Reserved</p>
+          <p>
+            Некоммерческое использование — бесплатно (личное / учебное). Коммерческое — по согласованию.
+            Подробнее: <code>LICENSE</code>, <code>TERMS.md</code>.
+          </p>
+          <p>
+            По вопросам коммерческого использования, приобретения лицензии или заказной доработки
+            обращайтесь:{' '}
+            <a href="mailto:serge.gromowik@gmail.com?subject=Commercial%20license%20%2F%20Object%20Tape%20%2F%20Response%20Language">
+              serge.gromowik@gmail.com
+            </a>
+          </p>
+          <p>
+            Участие в проекте (идеи, тесты):{' '}
+            <a href="mailto:serge.gromowik@gmail.com">serge.gromowik@gmail.com</a>
+          </p>
+          <p>
+            Связанный проект:{' '}
+            <a
+              href="https://models-for-psychology.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              models-for-psychology.vercel.app
+            </a>
+          </p>
+        </footer>
+      ) : null}
     </div>
   )
 }

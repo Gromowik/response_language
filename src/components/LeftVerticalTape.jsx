@@ -5,11 +5,13 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import styles from './LeftVerticalTape.module.css';
+import { canvasPointer, sizeCanvasToParent } from '../utils/viewport';
 
 const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => {
   const leftCanvasRef = useRef(null);
   const rightCanvasRef = useRef(null);
   const specialFocusCanvasRef = useRef(null);
+  const tapeContainerRef = useRef(null);
   
   // Sort mode: 'metrics' (by IN+OUT) or 'focusedAt' (by sum of focusedAt timestamps)
   const [sortMode, setSortMode] = useState('metrics');
@@ -90,7 +92,7 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
 
   const maxCards = Math.max(leftTapeCards.length, rightTapeCards.length);
   const [startIndex, setStartIndex] = useState(Math.max(0, maxCards - 10));
-  const [canvasHeight, setCanvasHeight] = useState(window.innerHeight);
+  const [layoutTick, setLayoutTick] = useState(0);
   const [leftSelectedIndex, setLeftSelectedIndex] = useState(null);
   const [rightSelectedIndex, setRightSelectedIndex] = useState(null);
   const [leftDragging, setLeftDragging] = useState(null);
@@ -103,18 +105,20 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
 
   const CARD_WIDTH = 80;
   const CARD_SPACING = 20;
+  const TOP_PAD = 48;
   const MAX_VISIBLE = 10;
 
   // Focus is always on the topmost (first visible) card on left tape
   const focusIndex = startIndex;
 
-  // Handle window resize
+  // Размер canvas = CSS-бокс родителя (без растяжения 100vh)
   useEffect(() => {
-    const handleResize = () => {
-      setCanvasHeight(window.innerHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const el = tapeContainerRef.current;
+    if (!el) return undefined;
+    const ro = new ResizeObserver(() => setLayoutTick((t) => t + 1));
+    ro.observe(el);
+    setLayoutTick((t) => t + 1);
+    return () => ro.disconnect();
   }, []);
 
   // Draw left tape (own order)
@@ -122,16 +126,14 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     const canvas = leftCanvasRef.current;
     if (!canvas) return;
 
-    const width = window.innerWidth / 2;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const { width, height } = sizeCanvasToParent(canvas);
+    if (width < 2 || height < 2) return;
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#f5f5f5';
     ctx.fillRect(0, 0, width, height);
 
-    const tapeX = width - 300;
+    const tapeX = Math.max(CARD_WIDTH + 90, Math.floor(width * 0.72));
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -140,7 +142,10 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     ctx.stroke();
 
     const visibleCards = leftTapeCards.slice(startIndex, startIndex + MAX_VISIBLE);
-    const cardOffsetY = (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2;
+    const cardOffsetY = Math.max(
+      TOP_PAD,
+      (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2
+    );
 
     visibleCards.forEach((card, idx) => {
       if (!card) return;
@@ -227,23 +232,21 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
 
       ctx.globalAlpha = 1.0;
     }
-  }, [leftTapeCards, startIndex, canvasHeight, leftSelectedIndex, leftDragging]);
+  }, [leftTapeCards, startIndex, layoutTick, leftSelectedIndex, leftDragging]);
 
   // Draw right tape (sorted as in Both Vertical)
   useEffect(() => {
     const canvas = rightCanvasRef.current;
     if (!canvas) return;
 
-    const width = window.innerWidth / 2;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const { width, height } = sizeCanvasToParent(canvas);
+    if (width < 2 || height < 2) return;
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#f5f5f5';
     ctx.fillRect(0, 0, width, height);
 
-    const tapeX = 300;
+    const tapeX = Math.min(Math.floor(width * 0.28), width - CARD_WIDTH - 90);
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -252,7 +255,10 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     ctx.stroke();
 
     const visibleCards = rightTapeCards.slice(startIndex, startIndex + MAX_VISIBLE);
-    const cardOffsetY = (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2;
+    const cardOffsetY = Math.max(
+      TOP_PAD,
+      (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2
+    );
 
     visibleCards.forEach((card, idx) => {
       if (!card) return;
@@ -324,17 +330,15 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
       card._actualIdx = actualIdx;
     });
 
-  }, [rightTapeCards, startIndex, canvasHeight, rightSelectedIndex, vectorMode]);
+  }, [rightTapeCards, startIndex, layoutTick, rightSelectedIndex, vectorMode]);
 
   // Draw special focus on overlay canvas (centered between planes)
   useEffect(() => {
     const canvas = specialFocusCanvasRef.current;
     if (!canvas) return;
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const { width, height } = sizeCanvasToParent(canvas);
+    if (width < 2 || height < 2) return;
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, width, height);
@@ -342,9 +346,8 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     // Draw special focus (circle at center between planes)
     const specialCard = specialFocusCardId ? rightTapeCards.find(c => c.id === specialFocusCardId) : null;
     if (specialCard) {
-      // Center between planes = window.innerWidth / 2
       const centerX = width / 2;
-      const specialY = 50;
+      const specialY = TOP_PAD + CARD_WIDTH / 2;
       
       ctx.fillStyle = specialCard.color;
       ctx.beginPath();
@@ -367,7 +370,7 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
       specialCard._specialFocusY = specialY;
       specialCard._specialFocusRadius = CARD_WIDTH / 2;
     }
-  }, [specialFocusCardId, rightTapeCards]);
+  }, [specialFocusCardId, rightTapeCards, layoutTick]);
 
   // Mouse handlers for left tape (drag & drop)
   const handleLeftMouseDown = (e) => {
@@ -377,9 +380,7 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     const canvas = leftCanvasRef.current;
     if (!canvas) return;
     
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     const visibleCards = leftTapeCards.slice(startIndex, startIndex + MAX_VISIBLE);
     for (let i = 0; i < visibleCards.length; i++) {
@@ -414,9 +415,7 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     const canvas = leftCanvasRef.current;
     if (!canvas) return;
     
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     setLeftDragging({
       ...leftDragging,
@@ -432,13 +431,14 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
 
     const timeDiff = Date.now() - leftDragging.startTime;
     const canvas = leftCanvasRef.current;
-    if (!canvas) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const y = e.clientY - rect.top;
+    if (!canvas) {
+      setLeftDragging(null);
+      return;
+    }
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     const distMoved = Math.sqrt(
-      Math.pow((e.clientX - rect.left) - leftDragging.currentX, 2) +
+      Math.pow(x - leftDragging.currentX, 2) +
       Math.pow(y - leftDragging.currentY, 2)
     );
 
@@ -452,8 +452,11 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     }
 
     // Calculate drop position
-    const height = canvasHeight;
-    const cardOffsetY = (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2;
+    const height = canvas.height;
+    const cardOffsetY = Math.max(
+      TOP_PAD,
+      (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2
+    );
     const relativeY = y - cardOffsetY;
     const dropSlot = Math.round(relativeY / (CARD_WIDTH + CARD_SPACING));
     const newPosition = startIndex + Math.max(0, Math.min(dropSlot, MAX_VISIBLE - 1));
@@ -474,9 +477,7 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     const canvas = leftCanvasRef.current;
     if (!canvas) return;
     
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     const visibleCards = leftTapeCards.slice(startIndex, startIndex + MAX_VISIBLE);
     for (let i = 0; i < visibleCards.length; i++) {
@@ -528,13 +529,13 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
     }
 
     const canvas = rightCanvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    if (!canvas) return;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     const visibleCards = rightTapeCards.slice(startIndex, startIndex + MAX_VISIBLE);
     for (let i = 0; i < visibleCards.length; i++) {
       const card = visibleCards[i];
+      if (!card || card._canvasX == null) continue;
       const dist = Math.sqrt(
         Math.pow(x - card._canvasX, 2) +
         Math.pow(y - (card._canvasY + CARD_WIDTH / 2), 2)
@@ -638,6 +639,7 @@ const LeftVerticalTape = ({ cards, otherCards, onCardEdit, onCardsReorder }) => 
       </div>
 
       <div 
+        ref={tapeContainerRef}
         className={styles.tapeContainer}
         onDoubleClick={(e) => {
           // Handle double-click on special focus circle (checks coordinates)

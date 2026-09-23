@@ -5,11 +5,13 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import styles from './BothVerticalTapes.module.css';
+import { canvasPointer, sizeCanvasToParent } from '../utils/viewport';
 
 const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardEdit, onLeftCardsReorder, onRightCardsReorder }) => {
   const leftCanvasRef = useRef(null);
   const rightCanvasRef = useRef(null);
   const connectionsCanvasRef = useRef(null);
+  const tapeContainerRef = useRef(null);
   
   // Sort mode: 'metrics' (by IN+OUT) or 'focusedAt' (by sum of focusedAt timestamps)
   const [sortMode, setSortMode] = useState('metrics');
@@ -103,23 +105,23 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
   
   const maxCards = Math.max(sortedLeftCards.length, sortedRightCards.length);
   const [startIndex, setStartIndex] = useState(Math.max(0, maxCards - 10));
-  
-  const [canvasHeight, setCanvasHeight] = useState(window.innerHeight);
-  
+  const [layoutTick, setLayoutTick] = useState(0);
   const [leftSelectedIndex, setLeftSelectedIndex] = useState(null);
   const [rightSelectedIndex, setRightSelectedIndex] = useState(null);
 
   const CARD_WIDTH = 80;
   const CARD_SPACING = 20;
+  const TOP_PAD = 48;
   const MAX_VISIBLE = 10;
 
-  // Handle window resize
+  // Размер canvas = CSS-бокс родителя (без растяжения 100vh)
   useEffect(() => {
-    const handleResize = () => {
-      setCanvasHeight(window.innerHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const el = tapeContainerRef.current;
+    if (!el) return undefined;
+    const ro = new ResizeObserver(() => setLayoutTick((t) => t + 1));
+    ro.observe(el);
+    setLayoutTick((t) => t + 1);
+    return () => ro.disconnect();
   }, []);
 
   // Draw left tape
@@ -127,16 +129,14 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
     const canvas = leftCanvasRef.current;
     if (!canvas) return;
 
-    const width = window.innerWidth / 2;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const { width, height } = sizeCanvasToParent(canvas);
+    if (width < 2 || height < 2) return;
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#f5f5f5';
     ctx.fillRect(0, 0, width, height);
 
-    const tapeX = width - 300;
+    const tapeX = Math.max(CARD_WIDTH + 90, Math.floor(width * 0.72));
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -145,7 +145,10 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
     ctx.stroke();
 
     const visibleCards = sortedLeftCards.slice(startIndex, startIndex + MAX_VISIBLE);
-    const cardOffsetY = (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2;
+    const cardOffsetY = Math.max(
+      TOP_PAD,
+      (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2
+    );
 
     visibleCards.forEach((card, idx) => {
       if (!card) return; // Skip null placeholders
@@ -221,23 +224,21 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
     ctx.lineTo(tapeX + 50, focusY + 12);
     ctx.closePath();
     ctx.fill();
-  }, [sortedLeftCards, startIndex, canvasHeight, leftSelectedIndex]);
+  }, [sortedLeftCards, startIndex, layoutTick, leftSelectedIndex]);
 
   // Draw right tape
   useEffect(() => {
     const canvas = rightCanvasRef.current;
     if (!canvas) return;
 
-    const width = window.innerWidth / 2;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const { width, height } = sizeCanvasToParent(canvas);
+    if (width < 2 || height < 2) return;
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#f5f5f5';
     ctx.fillRect(0, 0, width, height);
 
-    const tapeX = 300;
+    const tapeX = Math.min(Math.floor(width * 0.28), width - CARD_WIDTH - 90);
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -246,7 +247,10 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
     ctx.stroke();
 
     const visibleCards = sortedRightCards.slice(startIndex, startIndex + MAX_VISIBLE);
-    const cardOffsetY = (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2;
+    const cardOffsetY = Math.max(
+      TOP_PAD,
+      (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2
+    );
 
     visibleCards.forEach((card, idx) => {
       if (!card) return; // Skip null placeholders
@@ -322,17 +326,15 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
     ctx.lineTo(tapeX - 50, focusY + 12);
     ctx.closePath();
     ctx.fill();
-  }, [sortedRightCards, startIndex, canvasHeight, rightSelectedIndex]);
+  }, [sortedRightCards, startIndex, layoutTick, rightSelectedIndex]);
 
   // Draw connection lines between paired objects
   useEffect(() => {
     const canvas = connectionsCanvasRef.current;
     if (!canvas) return;
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const { width, height } = sizeCanvasToParent(canvas);
+    if (width < 2 || height < 2) return;
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, width, height);
@@ -356,11 +358,15 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
     });
 
     // Draw lines for visible pairs
-    const leftWidth = width / 2;
-    const rightWidth = width / 2;
-    const leftTapeX = leftWidth - 300;
-    const rightTapeX = 300;
-    const cardOffsetY = (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2;
+    const leftWidth = Math.floor(width / 2);
+    const leftSideWidth = leftCanvasRef.current?.parentElement?.clientWidth || leftWidth;
+    const rightSideWidth = rightCanvasRef.current?.parentElement?.clientWidth || leftWidth;
+    const leftTapeX = Math.max(CARD_WIDTH + 90, Math.floor(leftSideWidth * 0.72));
+    const rightTapeX = Math.min(Math.floor(rightSideWidth * 0.28), rightSideWidth - CARD_WIDTH - 90);
+    const cardOffsetY = Math.max(
+      TOP_PAD,
+      (height - MAX_VISIBLE * (CARD_WIDTH + CARD_SPACING)) / 2
+    );
 
     pairs.forEach(pair => {
       // Both cards are at the same index (already aligned)
@@ -383,18 +389,18 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
         ctx.setLineDash([]);
       }
     });
-  }, [sortedLeftCards, sortedRightCards, startIndex, canvasHeight]);
+  }, [sortedLeftCards, sortedRightCards, startIndex, layoutTick]);
 
   // Mouse handlers for both tapes (only for double-click editing)
   const handleLeftDoubleClick = (e) => {
     const canvas = leftCanvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    if (!canvas) return;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     const visibleCards = sortedLeftCards.slice(startIndex, startIndex + MAX_VISIBLE);
     for (let i = 0; i < visibleCards.length; i++) {
       const card = visibleCards[i];
+      if (!card || card._canvasX == null) continue;
       const dist = Math.sqrt(
         Math.pow(x - card._canvasX, 2) +
         Math.pow(y - (card._canvasY + CARD_WIDTH / 2), 2)
@@ -409,13 +415,13 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
 
   const handleRightDoubleClick = (e) => {
     const canvas = rightCanvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    if (!canvas) return;
+    const { x, y } = canvasPointer(canvas, e.clientX, e.clientY);
 
     const visibleCards = sortedRightCards.slice(startIndex, startIndex + MAX_VISIBLE);
     for (let i = 0; i < visibleCards.length; i++) {
       const card = visibleCards[i];
+      if (!card || card._canvasX == null) continue;
       const dist = Math.sqrt(
         Math.pow(x - card._canvasX, 2) +
         Math.pow(y - (card._canvasY + CARD_WIDTH / 2), 2)
@@ -458,7 +464,7 @@ const BothVerticalTapes = ({ leftCards, rightCards, onLeftCardEdit, onRightCardE
         <button onClick={() => setStartIndex(Math.min(maxCards - MAX_VISIBLE, startIndex + 1))} disabled={!canScrollDown}>Down ↓</button>
       </div>
 
-      <div className={styles.tapeContainer}>
+      <div ref={tapeContainerRef} className={styles.tapeContainer}>
         <div className={styles.leftSide}>
           <canvas
             ref={leftCanvasRef}

@@ -37,8 +37,8 @@ export function getFitCircleRadius(baseRadius, canvasWidth, canvasHeight, cardWi
 /** Map pointer coords from CSS box to canvas bitmap space. */
 export function canvasPointer(canvas, clientX, clientY) {
   const rect = canvas.getBoundingClientRect()
-  const scaleX = canvas.width / rect.width
-  const scaleY = canvas.height / rect.height
+  const scaleX = canvas.width / (rect.width || 1)
+  const scaleY = canvas.height / (rect.height || 1)
   return {
     x: (clientX - rect.left) * scaleX,
     y: (clientY - rect.top) * scaleY,
@@ -46,4 +46,14 @@ export function canvasPointer(canvas, clientX, clientY) {
     scaleY,
     rect,
   }
+}
+
+/** Set canvas bitmap to parent CSS box (avoids stretch distortion). */
+export function sizeCanvasToParent(canvas) {
+  const parent = canvas.parentElement
+  const width = Math.max(1, Math.floor(parent?.clientWidth || canvas.clientWidth || 1))
+  const height = Math.max(1, Math.floor(parent?.clientHeight || canvas.clientHeight || 1))
+  if (canvas.width !== width) canvas.width = width
+  if (canvas.height !== height) canvas.height = height
+  return { width, height }
 }

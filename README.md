@@ -27,7 +27,7 @@ React + Vite приложение для визуализации и управ�
 19. **Ring Demo** - O + внешнее кольцо R_O + трансляции на рычаге (`public/work/lever_ring_demo.json`; вход из Visual Model)
 20. **HF Centers** - центры высокой частоты / выпрямления (`public/work/hf_centers.json`; частота и личное касание в localStorage)
 21. **RL Trial** - пробный процесс на рычаге: два объекта (данность/работа), обмен, лента сессии + ваши ленты A/B (`public/work/lever_rl_trial_objects.json`); теория — вкладка / [`what_could_be_new.md`](./public/work/what_could_be_new.md)
-22. **Рабочий отпечаток** - среда случая 1 (рычаг): Visual Model, Ring Demo (вход/выход), **Person 1 Tape**, чтение **TODO**; лента внимания → рабочий Person 1 (`rl_work_person1_cards`), без перезаписи лицевого Сида; данные `lever_work_rings.json` + `TODO.md`
+22. **Рабочий отпечаток** - среда случая 1 (рычаг): Visual Model, Ring Demo (вход/выход), **Person 1 / Person 2 Tape**, чтение **TODO**; лента внимания → рабочий Person 1; Cursor Person 2 — `cursor_person2_tape.json`; Сид не перезаписываем (`TODO.md`)
 
 ### Подготовка объекта к RL (новые слои)
 

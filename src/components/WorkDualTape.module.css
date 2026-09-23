@@ -1,0 +1,88 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  padding: 0.5rem 0 1.5rem;
+  box-sizing: border-box;
+}
+
+.band {
+  background: #f7faf9;
+  border: 1px solid #c8e6c9;
+  border-radius: 10px;
+  padding: 0.35rem 0 0.75rem;
+  overflow: hidden;
+}
+
+.bandContact {
+  background: #f3f6fb;
+  border-color: #90caf9;
+}
+
+.head {
+  padding: 0.65rem 1rem 0.25rem;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #558b2f;
+}
+
+.title {
+  margin: 0.15rem 0 0.25rem;
+  font-size: 1.15rem;
+  color: #1b5e20;
+}
+
+.bandContact .title {
+  color: #1565c0;
+}
+
+.bandContact .kicker {
+  color: #1976d2;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #546e7a;
+  line-height: 1.4;
+}
+
+.empty {
+  margin: 0 1rem 0.35rem;
+  font-size: 0.85rem;
+  color: #78909c;
+  font-style: italic;
+}
+
+.navRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.navBtn {
+  border: 1px solid #42a5f5;
+  background: #e3f2fd;
+  color: #0d47a1;
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.navBtn:hover:not(:disabled) {
+  background: #bbdefb;
+}
+
+.navBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

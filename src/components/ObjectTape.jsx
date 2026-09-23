@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './ObjectTape.module.css';
 import { canvasPointer } from '../utils/viewport';
 
-const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToCircular }) => {
+const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToCircular, onSendToContact, onRemoveFromContact, contactSendLabel }) => {
   const canvasRef = useRef(null);
   const scrollControlRef = useRef(null);
   const [startIndex, setStartIndex] = useState(Math.max(0, cards.length - 10));
@@ -35,6 +35,16 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
       setStartIndex(maxStart);
     }
   }, [MAX_VISIBLE, cards.length, startIndex]);
+
+  // Сброс выделения / особого фокуса, если карточки убрали (напр. «↑ Убрать»)
+  useEffect(() => {
+    if (selectedIndex != null && (selectedIndex < 0 || selectedIndex >= cards.length)) {
+      setSelectedIndex(null)
+    }
+    if (specialFocusCardId && !cards.some((c) => c.id === specialFocusCardId)) {
+      setSpecialFocusCardId(null)
+    }
+  }, [cards, selectedIndex, specialFocusCardId]);
 
   // Handle window resize
   useEffect(() => {
@@ -375,9 +385,12 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
   // Scroll controls - navigate through cards
   const canScrollLeft = startIndex > 0;
   const canScrollRight = startIndex < cards.length - MAX_VISIBLE;
-  const canMoveToFocus = selectedIndex !== null && selectedIndex !== focusIndex;
-  const selectedCard = selectedIndex !== null ? cards[selectedIndex] : null;
-  const canMoveToSpecialFocus = selectedCard !== null && selectedCard.id !== specialFocusCardId;
+  const canMoveToFocus = selectedIndex !== null && selectedIndex !== focusIndex && !!cards[selectedIndex];
+  const selectedCard =
+    selectedIndex !== null && selectedIndex >= 0 && selectedIndex < cards.length
+      ? cards[selectedIndex]
+      : null;
+  const canMoveToSpecialFocus = selectedCard != null && selectedCard.id !== specialFocusCardId;
 
   const moveSelectedToFocus = () => {
     if (selectedIndex !== null && onCardsReorder) {
@@ -461,6 +474,50 @@ const ObjectTape = ({ cards, onCardSelect, onCardEdit, onCardsReorder, onSendToC
             title="Send objects to Circular Tape (focus object at top)"
           >
             ⭕ Send to Circular
+          </button>
+        )}
+        {onSendToContact && (
+          <button
+            type="button"
+            onClick={() => {
+              let card = null
+              if (selectedIndex != null && cards[selectedIndex]) {
+                card = cards[selectedIndex]
+              } else if (specialFocusCardId) {
+                card = cards.find((c) => c.id === specialFocusCardId) || null
+              } else if (cards[focusIndex]) {
+                card = cards[focusIndex]
+              }
+              if (card) onSendToContact(card)
+            }}
+            disabled={!cards.length}
+            title="Послать выделенное (или особый фокус / фокус справа) на ленту соприкосновения"
+          >
+            {contactSendLabel || '↓ В соприкосновение'}
+          </button>
+        )}
+        {onRemoveFromContact && (
+          <button
+            type="button"
+            onClick={() => {
+              let card = null
+              if (selectedIndex != null && cards[selectedIndex]) {
+                card = cards[selectedIndex]
+              } else if (specialFocusCardId) {
+                card = cards.find((c) => c.id === specialFocusCardId) || null
+              } else if (cards[focusIndex]) {
+                card = cards[focusIndex]
+              }
+              if (card) {
+                onRemoveFromContact(card)
+                setSelectedIndex(null)
+                if (specialFocusCardId === card.id) setSpecialFocusCardId(null)
+              }
+            }}
+            disabled={!cards.length}
+            title="Убрать выделенное с ленты соприкосновения"
+          >
+            ↑ Убрать
           </button>
         )}
         <span className={styles.info}>

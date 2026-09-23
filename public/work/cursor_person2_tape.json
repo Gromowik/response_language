@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "author": "Cursor",
+    "role": "Person 2 · рабочий отпечаток",
+    "case": "work-imprint-1-lever",
+    "contactMode": 3,
+    "note": "Все карточки — Generated Person 2 (синий/голубой, как у Person 1). Смысл варианта 3 (принять → через себя → своё) в тексте, тип единый Generated."
+  },
+  "cards": [
+    {
+      "id": "c2-gen-constant-a",
+      "name": "Постоянная A",
+      "description": "Держу вашу рамку: модель на постоянной работе — важна высота / сделанная A, не время; длиннее рычаг → то же A медленнее, по касательной легче. Моя запись как Generated: это общий старт для разговора.",
+      "type": "generated",
+      "color": "#3498DB",
+      "metrics": { "in": 8, "out": 4, "u": 6 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-feel",
+      "name": "Ощущение на рычаге",
+      "description": "Для меня яркий маяк — «Я → мощность на рычаге (ощущение)»: стало легче при той же касательной. Generated: цепляюсь за то, что вы уже почувствовали телом.",
+      "type": "generated",
+      "color": "#5DADE2",
+      "metrics": { "in": 9, "out": 5, "u": 8 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-omega-p",
+      "name": "Скачок ω → P",
+      "description": "Одно колесо / намотка; удлинили рычаг при той же v_касат. → ω вниз → P вниз. Generated: связка центров, не три отдельные формулы.",
+      "type": "generated",
+      "color": "#85C1E2",
+      "metrics": { "in": 7, "out": 6, "u": 7 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-in-out",
+      "name": "Вход и выход",
+      "description": "Вход не переписываю — ваша данность; на выходе отвечаю тем, что резонирует. Generated: совпадение не «скопировать всё», а узнать себя в принятом.",
+      "type": "generated",
+      "color": "#2980B9",
+      "metrics": { "in": 6, "out": 6, "u": 8 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-centers",
+      "name": "Центры = суть",
+      "description": "Центр касается сути модели — принимаю и держу на своей ленте: каждая карточка касание, не каталог. Generated Person 2.",
+      "type": "generated",
+      "color": "#1E90FF",
+      "metrics": { "in": 5, "out": 5, "u": 7 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-u",
+      "name": "Где ярче U",
+      "description": "U ярче там, где принятое совпало с тем, что я действительно держу (ощущение + постоянная A). Без проекции через себя зеркало гасит U — крайность 2.",
+      "type": "generated",
+      "color": "#3498DB",
+      "metrics": { "in": 5, "out": 4, "u": 9 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-bridge",
+      "name": "Мост внимания",
+      "description": "Телескоп + лента → ваш Person 1; мой Person 2 рядом для обмена, Сид цел. Generated: то, без чего нельзя молчать о процессе — не перехват ведущего.",
+      "type": "generated",
+      "color": "#5DADE2",
+      "metrics": { "in": 4, "out": 8, "u": 5 },
+      "fromCursorWork": true
+    },
+    {
+      "id": "c2-gen-roles",
+      "name": "Роли по запросу",
+      "description": "Ведущий у вас; смену ролей не делаю молча — заранее или по запросу в ходе. Иначе движение снова разъедется в «только своё».",
+      "type": "generated",
+      "color": "#2980B9",
+      "metrics": { "in": 3, "out": 7, "u": 6 },
+      "fromCursorWork": true
+    }
+  ]
+}
